@@ -1,0 +1,11 @@
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\bin\Debug\compilador.exe.config
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\bin\Debug\compilador.exe
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\bin\Debug\compilador.pdb
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\obj\Debug\compilador.csprojResolveAssemblyReference.cache
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\obj\Debug\compilador.exe
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\obj\Debug\compilador.pdb
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\IDE\IDE\bin\Debug\compilador\compilador\bin\Debug\compilador.exe
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\IDE\IDE\bin\Debug\compilador\compilador\bin\Debug\compilador.exe.config
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\IDE\IDE\bin\Debug\compilador\compilador\obj\Debug\compilador.exe
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\IDE\IDE\bin\Debug\compilador\compilador\obj\Debug\compilador.pdb
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\IDE\IDE\bin\Debug\compilador\compilador\bin\Debug\compilador.pdb
