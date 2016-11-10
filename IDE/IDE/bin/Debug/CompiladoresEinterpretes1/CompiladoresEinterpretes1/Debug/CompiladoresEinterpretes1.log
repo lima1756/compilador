@@ -1,0 +1,13 @@
+﻿  CompiladoresEinterpretes1.cpp
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\rlutil.h(585): warning C4101: 'numberOfCharsWritten': unreferenced local variable
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(64): warning C4018: '<': signed/unsigned mismatch
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(127): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(237): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(349): warning C4018: '<=': signed/unsigned mismatch
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(356): warning C4018: '<=': signed/unsigned mismatch
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(542): warning C4129: 'p': unrecognized character escape sequence
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(547): warning C4018: '<=': signed/unsigned mismatch
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(558): warning C4018: '<=': signed/unsigned mismatch
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(85): warning C4101: 'posy': unreferenced local variable
+c:\users\samantha\documents\visual studio 2015\projects\compiladoreseinterpretes1\compiladoreseinterpretes1\compiladoreseinterpretes1.cpp(85): warning C4101: 'posx': unreferenced local variable
+  CompiladoresEinterpretes1.vcxproj -> C:\Users\Samantha\Documents\Visual Studio 2015\Projects\CompiladoresEinterpretes1\Debug\CompiladoresEinterpretes1.exe
