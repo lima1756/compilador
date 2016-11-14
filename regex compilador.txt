@@ -1,0 +1,21 @@
+Strings: (\u00B4((\\\u00B4)|([^\u00B4]))*\u00B4)
+Identificadores: ([A-Za-z]+[A-Za-z-_\d]*[A-Za-z\d])|[A-Za-z]
+Delimitadores: [\(\)\{\}\[\].,]
+Operadores: [\.=\+\-/*]
+Logicos: >=|<=|>|<|==|!|&&|\|\|
+Numeros: Flotante: \d*\.?\d+
+Espacios: \s+
+
+
+
+Flotante: \d*\.?\d+
+Entero: \d+
+
+Punto: \.
+Llave inicial: {
+Llave final: {
+Parentesis inicial: \(
+Parentesis final: \)
+
+
+palabrasReservadas "escanear", "estampa", "zy", "tons", "mentre", "to", "por", "intel", "flot", "car"

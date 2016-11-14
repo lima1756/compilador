@@ -1,0 +1,7 @@
+C:\Users\Luis Iván Morett\Desktop\compiler\compiler\bin\Debug\compiler.exe.config
+C:\Users\Luis Iván Morett\Desktop\compiler\compiler\bin\Debug\compiler.exe
+C:\Users\Luis Iván Morett\Desktop\compiler\compiler\bin\Debug\compiler.pdb
+C:\Users\Luis Iván Morett\Desktop\compiler\compiler\bin\Debug\QUT.ShiftReduceParser.dll
+C:\Users\Luis Iván Morett\Desktop\compiler\compiler\obj\Debug\compiler.csprojResolveAssemblyReference.cache
+C:\Users\Luis Iván Morett\Desktop\compiler\compiler\obj\Debug\compiler.exe
+C:\Users\Luis Iván Morett\Desktop\compiler\compiler\obj\Debug\compiler.pdb
