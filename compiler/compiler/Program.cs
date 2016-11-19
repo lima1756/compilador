@@ -230,7 +230,7 @@ namespace compiler
 
         public static bool program()
         {
-            return functionList() || program();
+            return functionList() || (varDecl() && program());
         }
 
         public static bool functionList()
@@ -240,7 +240,28 @@ namespace compiler
 
         public static bool function()
         {
-            return 
+            bool check = myTokens.First.Value.id == "integer";
+            myTokens.RemoveFirst();
+            check = check && (myTokens.First.Value.id == "UserDefined");
+            myTokens.RemoveFirst();
+            check = check && (myTokens.First.Value.id == "LeftBrack");
+            myTokens.RemoveFirst();
+            check = check && listDeclVar();
+            myTokens.RemoveFirst();
+            check = check && (myTokens.First.Value.id == "LeftBrack");
+            myTokens.RemoveFirst();
+            check = check && (myTokens.First.Value.id == "LeftBrack");
+            //myTokens.First.Value.id;
+            return check;
+        }
+
+        public static bool listDeclVar()
+        {
+            return true;
+        }
+        public static bool varDecl()
+        {
+            return true;
         }
 /*
         public static void syntax()
