@@ -228,11 +228,20 @@ namespace compiler
             return "ERROR";
         }
 
-        /*
-         * Estructura para separar cada linea
-         * Y para obtener su numero
-         */
+        public static bool program()
+        {
+            return functionList() || program();
+        }
 
+        public static bool functionList()
+        {
+            return function() || (function() && functionList());
+        }
+
+        public static bool function()
+        {
+            return 
+        }
 /*
         public static void syntax()
         {
