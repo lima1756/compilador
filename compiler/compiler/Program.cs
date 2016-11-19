@@ -7,13 +7,18 @@ namespace compiler
     class Program
     {
         private static LinkedList<tokens> myTokens;
+        private static int level;
+        private static bool errorFlag;
+
         static void Main(string[] args)
         {
             LinkedList<lineas> allCode = new LinkedList<lineas>();
             myTokens = new LinkedList<tokens>();
             int conteo = 0;
-            string path = 
-                @"D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\analyzer\Lex\myLex.lex";
+            level = 0;
+            errorFlag = false;
+            string path =
+                @"D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\Lenguaje inventado-prueba1.txt";
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
             string[] codelines = Regex.Split(code, @"\n |\r |\n\r |\r\n"); //Separa el codigo en lineas
@@ -28,7 +33,7 @@ namespace compiler
             foreach (lineas x in allCode)
             {
                 Match check = Regex.Match(x.linea,
-                    @"(\u00B4((\\\u00B4)|([^\u00B4]))*\u00B4)|(([A-Za-z]+[A-Za-z-_\d]*[A-Za-z\d])|[A-Za-z])|([\(\)\{\}\[\].,])|([\.=\+\-/*])|(>=|<=|>|<|==|!|&&|\|\|)|(\d*\.?\d+)|.");
+                    @"(\u00B4((\\\u00B4)|([^\u00B4]))*\u00B4)|(([A-Za-z]+[A-Za-z-_\d]*[A-Za-z\d])|[A-Za-z])|([\(\)\{\}\[\].,])|([\.=\+\-/*])|(&|>=|<=|>|<|==|!|&&|\|\|)|(\d*\.?\d+)|\'.*\'|.");
                 while (check.Success)
                 {
                     tokens myToken = new tokens();
@@ -45,7 +50,12 @@ namespace compiler
                 {
                     Console.WriteLine("Error en la linea: " + x.noLinea.ToString() + "\tError cerca de: " + x.myValue);
                 }
+                else
+                {
+                    Console.WriteLine(x.id + " - " + x.myValue + " - " + x.noLinea.ToString());
+                }
             }
+            syntax();
             Console.ReadKey();
         }
 
@@ -55,47 +65,51 @@ namespace compiler
          */
         public static string identifier(string word)
         {
+            if (Regex.IsMatch(word, @"\'.*\'"))
+            {
+                return "Comment";
+            }
             if (Regex.IsMatch(word, @"(\u00B4((\\\u00B4)|([^\u00B4]))*\u00B4)"))
             {
                 return "string";
             }
-            if (Regex.IsMatch(word, @"escanear"))
+            if (word == "escanear")
             {
                 return "read";
             }
-            if (Regex.IsMatch(word, @"estampa"))
+            if (word == @"estampa")
             {
                 return "write";
             }
-            if (Regex.IsMatch(word, @"zy"))
+            if (word == "zy")
             {
                 return "if";
             }
-            if (Regex.IsMatch(word, @"tons"))
+            if (word == "tons")
             {
                 return "else";
             }
-            if (Regex.IsMatch(word, @"mentre"))
+            if (word == "mentre")
             {
                 return "while";
             }
-            if (Regex.IsMatch(word, @"to"))
+            if (word == "to")
             {
                 return "do";
             }
-            if (Regex.IsMatch(word, @"por"))
+            if (word == "por")
             {
                 return "for";
             }
-            if (Regex.IsMatch(word, @"intel"))
+            if (word == "intel")
             {
                 return "integer";
             }
-            if (Regex.IsMatch(word, @"flot"))
+            if (word == "flot")
             {
                 return "float";
             }
-            if (Regex.IsMatch(word, @"car"))
+            if (word == "car")
             {
                 return "char";
             }
@@ -106,6 +120,10 @@ namespace compiler
             if (Regex.IsMatch(word, @"\."))
             {
                 return "EOL";
+            }
+            if (Regex.IsMatch(word, @","))
+            {
+                return "COMMA";
             }
             if (Regex.IsMatch(word, @"\d+"))
             {
@@ -150,6 +168,10 @@ namespace compiler
             if (Regex.IsMatch(word, @"&&"))
             {
                 return "OpAnd";
+            }
+            if (Regex.IsMatch(word, @"&"))
+            {
+                return "Direction";
             }
             if (Regex.IsMatch(word, @"\|\|"))
             {
@@ -199,7 +221,56 @@ namespace compiler
          * Estructura para separar cada linea
          * Y para obtener su numero
          */
-        struct lineas
+
+
+        public static void syntax()
+        {
+            LinkedList<tokens> newCopy = new LinkedList<tokens>(myTokens);
+            myTokens.Clear();
+            foreach(tokens x in newCopy)
+            {
+                if (x.id != "ERROR" && x.id != "Comment" && x.id != "WhiteSpace")
+                {
+                    myTokens.AddLast(x);
+                }
+            }
+            newCopy.Clear();
+            while (myTokens.Count>0)
+            {
+                tokens actual = myTokens.First.Value;
+                myTokens.RemoveFirst();
+                FirstTokenIdentifier(actual);
+            }
+        }
+
+        private static void FirstTokenIdentifier(tokens myToken)
+        {
+            if (level == 0){
+                if (myToken.id == "integer") {
+
+                }
+                else if (myToken.id == "float" || myToken.id == "car") { }
+                else {
+                    Console.WriteLine("Error near line: " + myToken.noLinea);
+                    errorFlag = true;
+                }
+            }
+        }
+
+        private static void varDecl()
+        {
+            tokens actual = myTokens.First.Value;
+            while (actual.id != "EOL")
+            {
+
+            }
+        }
+
+        /*
+         * Estructura para almacenar cada linea
+         * Y el numero correspondiente de linea
+         */
+        private struct lineas
         {
             public int noLinea;
             public string linea;
@@ -209,13 +280,11 @@ namespace compiler
          * Estructura para almacenar la información
          * de los distintos tokens del codigo
          */
-        struct tokens
+        private struct tokens
         {
             public string id;
             public string myValue;
             public int noLinea;
         }
-
-
     }
 }

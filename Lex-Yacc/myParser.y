@@ -76,7 +76,7 @@ statementList	:	/*Empty*/	{if($$.statementList == null)	{$$.statementList = new 
 									$$.statementList.InsertFront($1.statement);
 									
 								}
-				|	statementList EOL statement	{ $1.statementList.Add($3.statement); $$.statementList = $1.statementList; }
+				|	statementList EOL statement	EOL { $1.statementList.Add($3.statement); $$.statementList = $1.statementList; }
 				;
 			
 
