@@ -240,17 +240,24 @@ namespace compiler
 
         public static bool function()
         {
+            int count = 0;
             bool check = myTokens.First.Value.id == "integer";
-            myTokens.RemoveFirst();
+            count += 1;
             check = check && (myTokens.First.Value.id == "UserDefined");
-            myTokens.RemoveFirst();
+            count += 1;
             check = check && (myTokens.First.Value.id == "LeftBrack");
-            myTokens.RemoveFirst();
-            check = check && listDeclVar();
-            myTokens.RemoveFirst();
-            check = check && (myTokens.First.Value.id == "LeftBrack");
-            myTokens.RemoveFirst();
-            check = check && (myTokens.First.Value.id == "LeftBrack");
+            count += 1;
+            if (check)
+            {
+                while (count > 0)
+                {
+                    myTokens.RemoveFirst();
+                }
+                check = check && listDeclVar();
+                check = check && (myTokens.First.Value.id == "LeftBrack");
+                myTokens.RemoveFirst();
+                check = check && (myTokens.First.Value.id == "LeftBrack");
+            }
             //myTokens.First.Value.id;
             return check;
         }
