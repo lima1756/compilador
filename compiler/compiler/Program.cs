@@ -18,8 +18,7 @@ namespace compiler
             int conteo = 0;
             level = 0;
             errorFlag = false;
-            string path =
-                @"D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\Lenguaje inventado-prueba1.txt";
+            string path =@"Pruebas\Lenguaje inventado-prueba1.txt";
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
             string[] codelines = Regex.Split(code, @"\n |\r |\n\r |\r\n"); //Separa el codigo en lineas
