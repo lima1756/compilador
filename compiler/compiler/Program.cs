@@ -257,7 +257,14 @@ namespace compiler
 
         public static bool listDeclVar()
         {
-            return true;
+            bool check;
+            check = varDecl();
+            if (myTokens.First.Value.id == "COMMA")
+            {
+                myTokens.RemoveFirst();
+                check = check && listDeclVar();
+            }
+            return check;
         }
         public static bool varDecl()
         {
