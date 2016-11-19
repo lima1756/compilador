@@ -14,6 +14,7 @@ namespace compiler
         {
             LinkedList<lineas> allCode = new LinkedList<lineas>();
             myTokens = new LinkedList<tokens>();
+            LinkedList<tokens> newCopy;
             int conteo = 0;
             level = 0;
             errorFlag = false;
@@ -55,7 +56,17 @@ namespace compiler
                     Console.WriteLine(x.id + " - " + x.myValue + " - " + x.noLinea.ToString());
                 }
             }
-            syntax();
+            newCopy = new LinkedList<tokens>(myTokens);
+            myTokens.Clear();
+            foreach (tokens x in newCopy)
+            {
+                if (x.id != "ERROR" && x.id != "Comment" && x.id != "WhiteSpace")
+                {
+                    myTokens.AddLast(x);
+                }
+            }
+            newCopy.Clear();
+            newCopy = new LinkedList<tokens>(myTokens);
             Console.ReadKey();
         }
 
@@ -222,19 +233,10 @@ namespace compiler
          * Y para obtener su numero
          */
 
-
+/*
         public static void syntax()
         {
-            LinkedList<tokens> newCopy = new LinkedList<tokens>(myTokens);
-            myTokens.Clear();
-            foreach(tokens x in newCopy)
-            {
-                if (x.id != "ERROR" && x.id != "Comment" && x.id != "WhiteSpace")
-                {
-                    myTokens.AddLast(x);
-                }
-            }
-            newCopy.Clear();
+            
             while (myTokens.Count>0)
             {
                 tokens actual = myTokens.First.Value;
@@ -257,15 +259,20 @@ namespace compiler
             }
         }
 
-        private static void varDecl()
+        private static bool varDecl()
         {
-            tokens actual = myTokens.First.Value;
-            while (actual.id != "EOL")
+            int toErase;
+            bool toReturn = true;
+            foreach(tokens actual in myTokens)
             {
-
+                if(actual.id== "UserDefined")
+                {
+                    actual.
+                }
             }
+            return toReturn;
         }
-
+        */
         /*
          * Estructura para almacenar cada linea
          * Y el numero correspondiente de linea
