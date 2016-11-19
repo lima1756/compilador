@@ -252,11 +252,18 @@ namespace compiler
                 while (count > 0)
                 {
                     myTokens.RemoveFirst();
+                    count -= 1;
                 }
                 check = check && listDeclVar();
-                check = check && (myTokens.First.Value.id == "LeftBrack");
-                myTokens.RemoveFirst();
-                check = check && (myTokens.First.Value.id == "LeftBrack");
+                check = check && (myTokens.First.Value.id == "RightBrack");
+                count += 1;
+                check = check && (myTokens.First.Value.id == "LeftPar");
+                count += 1;
+                while (count > 0)
+                {
+                    myTokens.RemoveFirst();
+                    count -= 1;
+                }
             }
             //myTokens.First.Value.id;
             return check;
