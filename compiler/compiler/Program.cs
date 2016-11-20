@@ -7,8 +7,7 @@ namespace compiler
     class Program
     {
         private static LinkedList<tokens> myTokens;                // Almacena todos los tokens del codigo
-        private static LinkedList<tokens> myTokens2;               // Auxiliar. Almacena todos los tokens del codigo
-        private static int level;                                  // Almacena el nivel actual para identificarlo en la tabla de simbolos
+        private static string zone;                                // Almacena ubicación actual para identificarlo en la tabla de simbolos
         private static LinkedList<simbols> simbolsTable;           // Equivale a mi tabla de simbolos
         private static LinkedList<errors> errorsTable;             // Representa mi tabla de errores
 
@@ -20,8 +19,8 @@ namespace compiler
             errorsTable = new LinkedList<errors>();
             LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
             int conteo = 0;                                                 // Conteo auxiliar
-            level = 0;
             string path = @"Pruebas\Lenguaje inventado-prueba1.txt";       //Path donde leera el archivo a compilar
+            zone = "global";
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
             string[] codelines = Regex.Split(code, @"\n |\r |\n\r |\r\n"); //Separa el codigo en lineas
@@ -42,15 +41,15 @@ namespace compiler
                 {
                     tokens myToken = new tokens();
                     //Identifica al token especificamente con la función identifier.
-                    myToken.id=identifier(check.Value);
-                    myToken.myValue= string.Copy(check.Value);
-                    myToken.noLinea =x.noLinea;
+                    myToken.id = identifier(check.Value);
+                    myToken.myValue = string.Copy(check.Value);
+                    myToken.noLinea = x.noLinea;
                     myTokens.AddLast(myToken);
                     check = check.NextMatch();
                 }
             }
             //Agrega todo aquello que fue error lexico a la tabla de errores.
-            foreach(tokens x in myTokens)
+            foreach (tokens x in myTokens)
             {
                 if (x.id == "ERROR")
                 {
@@ -73,7 +72,6 @@ namespace compiler
             }
             newCopy.Clear();
             newCopy = new LinkedList<tokens>(myTokens);
-            myTokens2 = new LinkedList<tokens>(myTokens);
             program();
             Console.ReadKey();
         }
@@ -96,7 +94,7 @@ namespace compiler
             {
                 return "read";
             }
-            if (word == @"estampa")
+            if (word == "estampa")
             {
                 return "write";
             }
@@ -200,7 +198,7 @@ namespace compiler
             {
                 return "OpNotEqu";
             }
-            
+
             if (Regex.IsMatch(word, @"=="))
             {
                 return "OpEqu";
@@ -244,15 +242,16 @@ namespace compiler
         public static bool program()
         {
             bool check;
+            LinkedList<tokens> aux = new LinkedList<tokens>(myTokens);
             check = varDecl();
             if (check)
             {
-                eq2();
+                myTokens.RemoveFirst();
                 check = check && program();
             }
             else
             {
-                eq1(); 
+                myTokens = new LinkedList<tokens>(aux);
                 check = functionList();
             }
             return check;
@@ -267,11 +266,10 @@ namespace compiler
              * si lo hay revisa si es una funcion
              * en caso de no serlo se guarda como error
              */
-            if (check && myTokens.First != null) 
+            if (check && myTokens.First != null)
             {
-                eq2();
                 check = check && functionList();
-                if (check)
+                /*if (check)
                 {
                     eq1();
                 }
@@ -297,7 +295,7 @@ namespace compiler
                         newError.aprox = "EOF";
                         errorsTable.AddLast(newError);
                     }
-                }
+                }*/
             }
             return check;
         }
@@ -307,12 +305,14 @@ namespace compiler
             int count = 0;
             bool check = myTokens.First.Value.id == "integer";
             count += 1;
-            check = check && (myTokens.First.Value.id == "UserDefined");
+            check = check && (myTokens.First.Next.Value.id == "UserDefined");
             count += 1;
-            check = check && (myTokens.First.Value.id == "LeftBrack");
+            check = lookSimbols(myTokens.First.Next.Value);
+            check = check && (myTokens.First.Next.Next.Value.id == "LeftBrack");
             count += 1;
             if (check)
             {
+                zone = myTokens.First.Next.Value.myValue;
                 while (count > 0)
                 {
                     myTokens.RemoveFirst();
@@ -325,6 +325,8 @@ namespace compiler
                 count += 1;
                 tokensRemove(ref count);
             }
+            count = 0;
+            zone = "global";
             //myTokens.First.Value.id;
             return check;
         }
@@ -343,13 +345,14 @@ namespace compiler
         public static bool varDecl()
         {
             bool check;
-            bool check2;
-            string type="";
+            bool check2=false;
+            LinkedList<tokens> aux;
+            string type = "";
             if (myTokens.First.Value.id == "integer")
             {
                 type = "integer";
             }
-            else if(myTokens.First.Value.id == "char")
+            else if (myTokens.First.Value.id == "char")
             {
                 type = "char";
             }
@@ -360,8 +363,14 @@ namespace compiler
             if (type != "")
             {
                 myTokens.RemoveFirst();
+                aux = new LinkedList<tokens>(myTokens);
                 check = listDecl(type);
-                check2 = assignOp(type);
+                if (!check)
+                {
+                    myTokens = new LinkedList<tokens>(aux);
+                    check2 = assignOp(type);
+                }
+                check = check || check2;
             }
             else
             {
@@ -372,43 +381,75 @@ namespace compiler
 
         public static bool listDecl(string type)
         {
-            bool check=true;
+            bool check = true;
             int count = 0;
             string last;
-            last = myTokens.First.Value.id;
-            foreach(tokens x in myTokens)
-            {
-                if (check)
+            LinkedList<simbols> aux = new LinkedList<simbols>();
+            if (myTokens.First.Value.id == "UserDefined") {
+                last = myTokens.First.Value.id;
+                simbols sim = new simbols();
+                sim.id = myTokens.First.Value.myValue;
+                sim.lastLine = myTokens.First.Value.noLinea;
+                sim.type = type;
+                sim.zone = zone;
+                aux.AddLast(sim);
+                myTokens.RemoveFirst();
+                foreach (tokens x in myTokens)
                 {
-                    if (x.id != "EOL")
+                    if (check)
                     {
-                        if (last != "UserDefined" && x.id == "COMMA")
+                        if (x.id != "EOL" && x.id!= "OpAssign" && x.id != "RightBrack")
                         {
-                            last = x.id;
-                            check = true;
+                            if (last == "UserDefined" && x.id == "COMMA")
+                            {
+                                last = x.id;
+                                
+                                check = true;
+                            }
+                            if (last == "COMMA" && x.id == "UserDefined")
+                            {
+                                simbols another = new simbols();
+                                another.id = myTokens.First.Value.myValue;
+                                another.lastLine = myTokens.First.Value.noLinea;
+                                another.type = type;
+                                another.zone = zone;
+                                aux.AddLast(another);
+                                myTokens.RemoveFirst();
+                                last = x.id;
+                                check = true;
+                            }
+                            else
+                            {
+                                check = false;
+                                break;
+                            }
                         }
-                        if (last != "COMMA" && x.id == "UserDefined")
+                        else if (last != "UserDefined" && x.id == "EOL")
                         {
-                            last = x.id;
-                            check = true;
+                            check = false;
+                            break;
                         }
+                        else if (last == "UserDefined" && x.id == "RightBrack")
+                        {
+                            check = true;
+                            break;
+                        }
+                        else
+                        {
+                            check = false;
+                            break;
+                        }
+                        count += 1;
                     }
-                    else if (last != "UserDefined")
-                    {
-                        check = false;
-                    }
-                    count += 1;
                 }
+                tokensRemove(ref count);
             }
-            tokensRemove(ref count);
-            if (!check)
+            if (check)
             {
-                tokensRemoveEOL1();
-                errors newError = new errors();
-                newError.line = myTokens.First.Value.noLinea;
-                newError.type = "Syntax";
-                newError.aprox = myTokens.First.Value.id;
-                errorsTable.AddLast(newError);
+                foreach (simbols x in aux)
+                {
+                    simbolsTable.AddLast(x);
+                }
             }
             return check;
         }
@@ -416,16 +457,16 @@ namespace compiler
         public static bool assignOp(string type)
         {
             bool check;
-            if (myTokens2.First.Value.id == "UserDefined" && myTokens2.First.Next.Value.id == "OpAssign")
+            if (myTokens.First.Value.id == "UserDefined" && myTokens.First.Next.Value.id == "OpAssign")
             {
-                myTokens2.RemoveFirst();
-                myTokens2.RemoveFirst();
+                myTokens.RemoveFirst();
+                myTokens.RemoveFirst();
                 check = opExpr(type);
             }
             else
             {
                 check = false;
-                tokensRemoveEOL2();
+                tokensRemoveEOL1();
             }
             return check;
         }
@@ -433,24 +474,32 @@ namespace compiler
         private static bool opExpr(string type)
         {
             bool check=true;
+            bool semantic=false;
             string last;
-            if(type == "char" && myTokens2.First.Value.id == "char")
+            if((type == "char" && myTokens.First.Value.id == "char") || (type == "char" && myTokens.First.Value.id == "UserDefined"))
             {
-                myTokens2.RemoveFirst();
-                if (myTokens2.First.Value.id == "EOL")
+                if(myTokens.First.Value.id == "UserDefined")
                 {
-                    check = true;
+                    
                 }
-                else
+                if (semantic || myTokens.First.Value.id != "UserDefined")
                 {
-                    check = false;
+                    myTokens.RemoveFirst();
+                    if (myTokens.First.Value.id == "EOL")
+                    {
+                        check = true;
+                    }
+                    else
+                    {
+                        check = false;
+                    }
                 }
             }
-            else if(type =="integer" || type == "float")
+            else if(type =="integer" || type == "float" || type == "UserDefined")
             {
                 last = myTokens.First.Value.id;
                 myTokens.RemoveFirst();
-                for (int x = 0; (myTokens.First.Value.id != "EOL" || myTokens.First.Value.id != "RightPar") && last != "EOL"; x++)
+                for (int x = 0; (myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar") && last != "EOL"; x++)
                 {
                     if (last == "Entero" || last == "Flotante")
                     {
@@ -501,18 +550,90 @@ namespace compiler
             {
                 check = false;
             }
-            if (!check)
+            return check;
+        }
+
+        private static bool lookSimbols(tokens anotherToken)
+        {
+            bool semantic = true;
+            bool check = true;
+            foreach (simbols x in simbolsTable)
+            {
+                if(x.id== anotherToken.myValue && (x.zone == zone || x.zone == "global"))
+                {
+                    semantic = true;
+                    break;
+                }
+                else
+                {
+                    semantic = false;
+                }
+            }
+            if (!semantic)
             {
                 tokensRemoveEOL1();
                 errors newError = new errors();
                 newError.line = myTokens.First.Value.noLinea;
-                newError.type = "Syntax";
+                newError.type = "Semantic";
                 newError.aprox = myTokens.First.Value.id;
                 errorsTable.AddLast(newError);
+                check = false;
             }
             return check;
         }
 
+        private static bool statement()
+        {
+            bool check=false;
+            switch (myTokens.First.Value.id)
+            {
+                case "integer":
+                    check = varDecl();
+                    break;
+                case "char":
+                    check = varDecl();
+                    break;
+                case "float":
+                    check = varDecl();
+                    break;
+                case "UserDefined":
+                    break;
+                case "read":
+                    break;
+                case "write":
+                    break;
+                case "if":
+                    break;
+                case "while":
+                    break;
+                case "do":
+                    break;
+                case "for":
+                    break;
+                default:
+                    check = false;
+                    break;
+            } 
+            if (check)
+            {
+                myTokens.RemoveFirst();
+            }
+            else
+            {
+                syntaxError();
+            }
+            return check;
+        }
+
+        private static void syntaxError()
+        {
+            tokensRemoveEOL1();
+            errors newError = new errors();
+            newError.line = myTokens.First.Value.noLinea;
+            newError.type = "Syntax";
+            newError.aprox = myTokens.First.Value.id;
+            errorsTable.AddLast(newError);
+        }
         private static void tokensRemove(ref int count)
         {
             while (count > 0)
@@ -522,40 +643,15 @@ namespace compiler
             }
         }
 
-        private static void tokensRemove2(ref int count)
-        {
-            while (count > 0)
-            {
-                myTokens2.RemoveFirst();
-                count -= 1;
-            }
-        }
-
         private static void tokensRemoveEOL1()
         {
-            for (int x = 0; myTokens.First.Value.id != "EOL" || myTokens.First.Value.id != "RightPar"; x++)
+            for (int x = 0; myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar"; x++)
             {
                 myTokens.RemoveFirst();
             }
         }
 
-        private static void tokensRemoveEOL2()
-        {
-            for (int x = 0; myTokens2.First.Value.id != "EOL" || myTokens2.First.Value.id != "RightPar"; x++)
-            {
-                myTokens2.RemoveFirst();
-            }
-        }
 
-        private static void eq1()
-        {
-            myTokens = new LinkedList<tokens>(myTokens2);
-        }
-
-        private static void eq2()
-        {
-            myTokens2 = new LinkedList<tokens>(myTokens);
-        }
         /*
                 public static void syntax()
                 {
@@ -627,6 +723,7 @@ namespace compiler
             public string value;
             public int lastLine;
             public string id;
+            public string zone;
         }
 
         /*
