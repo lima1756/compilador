@@ -9,20 +9,18 @@ namespace compiler
         private static LinkedList<tokens> myTokens;                // Almacena todos los tokens del codigo
         private static LinkedList<tokens> myTokens2;               // Auxiliar. Almacena todos los tokens del codigo
         private static int level;                                  // Almacena el nivel actual para identificarlo en la tabla de simbolos
-        private static bool errorFlag;                             // En caso de ser verdadero en sintactico busca el siguiente EOL
-        private static Dictionary<string, simbols> simbolsTable;   // Equivale a mi tabla de simbolos
+        private static LinkedList<simbols> simbolsTable;           // Equivale a mi tabla de simbolos
         private static LinkedList<errors> errorsTable;             // Representa mi tabla de errores
 
         static void Main(string[] args)
         {
             LinkedList<lineas> allCode = new LinkedList<lineas>();
             myTokens = new LinkedList<tokens>();
-            simbolsTable = new Dictionary<string, simbols>();
+            simbolsTable = new LinkedList<simbols>();
             errorsTable = new LinkedList<errors>();
             LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
             int conteo = 0;                                                 // Conteo auxiliar
             level = 0;
-            errorFlag = false;
             string path = @"Pruebas\Lenguaje inventado-prueba1.txt";       //Path donde leera el archivo a compilar
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
@@ -164,7 +162,7 @@ namespace compiler
             }
             if (Regex.IsMatch(word, @"\*"))
             {
-                return "OpMyl";
+                return "OpMul";
             }
             if (Regex.IsMatch(word, @"\/"))
             {
@@ -405,10 +403,7 @@ namespace compiler
             tokensRemove(ref count);
             if (!check)
             {
-                for(int x=0; myTokens.First.Value.id!="EOL" || myTokens.First.Value.id != "RightPar"; x++)
-                {
-                    myTokens.RemoveFirst();
-                }
+                tokensRemoveEOL1();
                 errors newError = new errors();
                 newError.line = myTokens.First.Value.noLinea;
                 newError.type = "Syntax";
@@ -423,6 +418,8 @@ namespace compiler
             bool check;
             if (myTokens2.First.Value.id == "UserDefined" && myTokens2.First.Next.Value.id == "OpAssign")
             {
+                myTokens2.RemoveFirst();
+                myTokens2.RemoveFirst();
                 check = opExpr(type);
             }
             else
@@ -435,7 +432,8 @@ namespace compiler
 
         private static bool opExpr(string type)
         {
-            bool check;
+            bool check=true;
+            string last;
             if(type == "char" && myTokens2.First.Value.id == "char")
             {
                 myTokens2.RemoveFirst();
@@ -450,17 +448,71 @@ namespace compiler
             }
             else if(type =="integer" || type == "float")
             {
-                for(int x=0; myTokens.First.Value.id!="EOL"|| myTokens.First.Value.id != "RightPar")
+                last = myTokens.First.Value.id;
+                myTokens.RemoveFirst();
+                for (int x = 0; (myTokens.First.Value.id != "EOL" || myTokens.First.Value.id != "RightPar") && last != "EOL"; x++)
                 {
-                    if()
+                    if (last == "Entero" || last == "Flotante")
+                    {
+                        if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "OpMul" || myTokens.First.Value.id == "OpDiv")
+                        {
+                            last = myTokens.First.Value.id;
+                            myTokens.RemoveFirst();
+                            check = true;
+                        }
+                        else
+                        {
+                            check = false;
+                            break;
+                        }
+                    }
+                    else if (last == "OpAdd" || last == "OpMinus" || myTokens.First.Value.id == "OpMul" || myTokens.First.Value.id == "OpDiv")
+                    {
+                        if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante")
+                        {
+                            last = myTokens.First.Value.id;
+                            myTokens.RemoveFirst();
+                            check = true;
+                        }
+                        else if(myTokens.First.Value.id== "LeftPar")
+                        {
+                            myTokens.RemoveFirst();
+                            check = opExpr(type);
+                            myTokens.RemoveFirst();
+                            last = "Entero";
+                            if (!check)
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            check = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        check = false;
+                    }
                 }
             }
             else
             {
                 check = false;
             }
+            if (!check)
+            {
+                tokensRemoveEOL1();
+                errors newError = new errors();
+                newError.line = myTokens.First.Value.noLinea;
+                newError.type = "Syntax";
+                newError.aprox = myTokens.First.Value.id;
+                errorsTable.AddLast(newError);
+            }
             return check;
         }
+
         private static void tokensRemove(ref int count)
         {
             while (count > 0)
@@ -479,11 +531,19 @@ namespace compiler
             }
         }
 
-        private static void tokensRemoveEOL2()
+        private static void tokensRemoveEOL1()
         {
             for (int x = 0; myTokens.First.Value.id != "EOL" || myTokens.First.Value.id != "RightPar"; x++)
             {
                 myTokens.RemoveFirst();
+            }
+        }
+
+        private static void tokensRemoveEOL2()
+        {
+            for (int x = 0; myTokens2.First.Value.id != "EOL" || myTokens2.First.Value.id != "RightPar"; x++)
+            {
+                myTokens2.RemoveFirst();
             }
         }
 
@@ -566,6 +626,7 @@ namespace compiler
             public string type;
             public string value;
             public int lastLine;
+            public string id;
         }
 
         /*
