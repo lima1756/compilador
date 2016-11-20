@@ -6,19 +6,24 @@ namespace compiler
 {
     class Program
     {
-        private static LinkedList<tokens> myTokens;
-        private static int level;
-        private static bool errorFlag;
+        private static LinkedList<tokens> myTokens;                // Almacena todos los tokens del codigo
+        private static LinkedList<tokens> myTokens2;               // Auxiliar. Almacena todos los tokens del codigo
+        private static int level;                                  // Almacena el nivel actual para identificarlo en la tabla de simbolos
+        private static bool errorFlag;                             // En caso de ser verdadero en sintactico busca el siguiente EOL
+        private static Dictionary<string, simbols> simbolsTable;   // Equivale a mi tabla de simbolos
+        private static LinkedList<errors> errorsTable;             // Representa mi tabla de errores
 
         static void Main(string[] args)
         {
             LinkedList<lineas> allCode = new LinkedList<lineas>();
             myTokens = new LinkedList<tokens>();
-            LinkedList<tokens> newCopy;
-            int conteo = 0;
+            simbolsTable = new Dictionary<string, simbols>();
+            errorsTable = new LinkedList<errors>();
+            LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
+            int conteo = 0;                                                 // Conteo auxiliar
             level = 0;
             errorFlag = false;
-            string path =@"Pruebas\Lenguaje inventado-prueba1.txt";
+            string path = @"Pruebas\Lenguaje inventado-prueba1.txt";       //Path donde leera el archivo a compilar
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
             string[] codelines = Regex.Split(code, @"\n |\r |\n\r |\r\n"); //Separa el codigo en lineas
@@ -29,14 +34,16 @@ namespace compiler
                 line.noLinea = ++conteo;
                 allCode.AddLast(line);
             }
-            
+            //Lo siguiente sirve para ignorar tabuladores y la tokenización
             foreach (lineas x in allCode)
             {
+                // Expresión regular para identificar posibles tokens 
                 Match check = Regex.Match(x.linea,
                     @"(\u00B4((\\\u00B4)|([^\u00B4]))*\u00B4)|(([A-Za-z]+[A-Za-z-_\d]*[A-Za-z\d])|[A-Za-z])|([\(\)\{\}\[\].,])|([\.=\+\-/*])|(&|>=|<=|>|<|==|!|&&|\|\|)|(\d*\.?\d+)|\'.*\'|.");
                 while (check.Success)
                 {
                     tokens myToken = new tokens();
+                    //Identifica al token especificamente con la función identifier.
                     myToken.id=identifier(check.Value);
                     myToken.myValue= string.Copy(check.Value);
                     myToken.noLinea =x.noLinea;
@@ -44,15 +51,17 @@ namespace compiler
                     check = check.NextMatch();
                 }
             }
+            //Agrega todo aquello que fue error lexico a la tabla de errores.
             foreach(tokens x in myTokens)
             {
                 if (x.id == "ERROR")
                 {
-                    Console.WriteLine("Error en la linea: " + x.noLinea.ToString() + "\tError cerca de: " + x.myValue);
-                }
-                else
-                {
-                    Console.WriteLine(x.id + " - " + x.myValue + " - " + x.noLinea.ToString());
+                    errors newError = new errors();
+                    newError.line = x.noLinea;
+                    newError.type = "Lexical";
+                    newError.aprox = x.id;
+                    errorsTable.AddLast(newError);
+                    //Se deben de agregar los errores a una tabla de errores para que se impriman al final todos los conjuntos de errores en orden de lineas
                 }
             }
             newCopy = new LinkedList<tokens>(myTokens);
@@ -66,6 +75,8 @@ namespace compiler
             }
             newCopy.Clear();
             newCopy = new LinkedList<tokens>(myTokens);
+            myTokens2 = new LinkedList<tokens>(myTokens);
+            program();
             Console.ReadKey();
         }
 
@@ -227,14 +238,70 @@ namespace compiler
             return "ERROR";
         }
 
+        /*
+         * Aqui inicia el analizador sintactico, 
+         * todas las funciones hasta donde se 
+         * indiquen son parte del mismo
+         */
         public static bool program()
         {
-            return functionList() || (varDecl() && program());
+            bool check;
+            check = varDecl();
+            if (check)
+            {
+                eq2();
+                check = check && program();
+            }
+            else
+            {
+                eq1(); 
+                check = functionList();
+            }
+            return check;
         }
 
         public static bool functionList()
         {
-            return function() || (function() && functionList());
+            bool check;
+            check = function();
+            /*
+             * Revisa si hay algo despues de la primera función leida
+             * si lo hay revisa si es una funcion
+             * en caso de no serlo se guarda como error
+             */
+            if (check && myTokens.First != null) 
+            {
+                eq2();
+                check = check && functionList();
+                if (check)
+                {
+                    eq1();
+                }
+                else
+                {
+                    eq2();
+                    for (int x = 0; myTokens.First.Value.id != "EOL" || myTokens.First.Value.id != "RightPar" || myTokens.First.Value.id == null; x++)
+                    {
+                        myTokens.RemoveFirst();
+                    }
+                    errors newError = new errors();
+                    if (myTokens.First.Value.id != null)
+                    {
+                        newError.line = myTokens.First.Value.noLinea;
+                        newError.type = "Syntax";
+                        newError.aprox = myTokens.First.Value.id;
+                        errorsTable.AddLast(newError);
+                    }
+                    else
+                    {
+                        newError.line = -1;
+                        newError.type = "Syntax";
+                        newError.aprox = "EOF";
+                        errorsTable.AddLast(newError);
+                    }
+                }
+            }
+            return check;
         }
 
         public static bool function()
@@ -258,11 +325,7 @@ namespace compiler
                 count += 1;
                 check = check && (myTokens.First.Value.id == "LeftPar");
                 count += 1;
-                while (count > 0)
-                {
-                    myTokens.RemoveFirst();
-                    count -= 1;
-                }
+                tokensRemove(ref count);
             }
             //myTokens.First.Value.id;
             return check;
@@ -281,48 +344,198 @@ namespace compiler
         }
         public static bool varDecl()
         {
-            return true;
-        }
-/*
-        public static void syntax()
-        {
-            
-            while (myTokens.Count>0)
+            bool check;
+            bool check2;
+            string type="";
+            if (myTokens.First.Value.id == "integer")
             {
-                tokens actual = myTokens.First.Value;
+                type = "integer";
+            }
+            else if(myTokens.First.Value.id == "char")
+            {
+                type = "char";
+            }
+            else if (myTokens.First.Value.id == "float")
+            {
+                type = "float";
+            }
+            if (type != "")
+            {
                 myTokens.RemoveFirst();
-                FirstTokenIdentifier(actual);
+                check = listDecl(type);
+                check2 = assignOp(type);
             }
-        }
-
-        private static void FirstTokenIdentifier(tokens myToken)
-        {
-            if (level == 0){
-                if (myToken.id == "integer") {
-
-                }
-                else if (myToken.id == "float" || myToken.id == "car") { }
-                else {
-                    Console.WriteLine("Error near line: " + myToken.noLinea);
-                    errorFlag = true;
-                }
-            }
-        }
-
-        private static bool varDecl()
-        {
-            int toErase;
-            bool toReturn = true;
-            foreach(tokens actual in myTokens)
+            else
             {
-                if(actual.id== "UserDefined")
+                check = false;
+            }
+            return check;
+        }
+
+        public static bool listDecl(string type)
+        {
+            bool check=true;
+            int count = 0;
+            string last;
+            last = myTokens.First.Value.id;
+            foreach(tokens x in myTokens)
+            {
+                if (check)
                 {
-                    actual.
+                    if (x.id != "EOL")
+                    {
+                        if (last != "UserDefined" && x.id == "COMMA")
+                        {
+                            last = x.id;
+                            check = true;
+                        }
+                        if (last != "COMMA" && x.id == "UserDefined")
+                        {
+                            last = x.id;
+                            check = true;
+                        }
+                    }
+                    else if (last != "UserDefined")
+                    {
+                        check = false;
+                    }
+                    count += 1;
                 }
             }
-            return toReturn;
+            tokensRemove(ref count);
+            if (!check)
+            {
+                for(int x=0; myTokens.First.Value.id!="EOL" || myTokens.First.Value.id != "RightPar"; x++)
+                {
+                    myTokens.RemoveFirst();
+                }
+                errors newError = new errors();
+                newError.line = myTokens.First.Value.noLinea;
+                newError.type = "Syntax";
+                newError.aprox = myTokens.First.Value.id;
+                errorsTable.AddLast(newError);
+            }
+            return check;
         }
-        */
+
+        public static bool assignOp(string type)
+        {
+            bool check;
+            if (myTokens2.First.Value.id == "UserDefined" && myTokens2.First.Next.Value.id == "OpAssign")
+            {
+                check = opExpr(type);
+            }
+            else
+            {
+                check = false;
+                tokensRemoveEOL2();
+            }
+            return check;
+        }
+
+        private static bool opExpr(string type)
+        {
+            bool check;
+            if(type == "char" && myTokens2.First.Value.id == "char")
+            {
+                myTokens2.RemoveFirst();
+                if (myTokens2.First.Value.id == "EOL")
+                {
+                    check = true;
+                }
+                else
+                {
+                    check = false;
+                }
+            }
+            else if(type =="integer" || type == "float")
+            {
+                for(int x=0; myTokens.First.Value.id!="EOL"|| myTokens.First.Value.id != "RightPar")
+                {
+                    if()
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+        }
+        private static void tokensRemove(ref int count)
+        {
+            while (count > 0)
+            {
+                myTokens.RemoveFirst();
+                count -= 1;
+            }
+        }
+
+        private static void tokensRemove2(ref int count)
+        {
+            while (count > 0)
+            {
+                myTokens2.RemoveFirst();
+                count -= 1;
+            }
+        }
+
+        private static void tokensRemoveEOL2()
+        {
+            for (int x = 0; myTokens.First.Value.id != "EOL" || myTokens.First.Value.id != "RightPar"; x++)
+            {
+                myTokens.RemoveFirst();
+            }
+        }
+
+        private static void eq1()
+        {
+            myTokens = new LinkedList<tokens>(myTokens2);
+        }
+
+        private static void eq2()
+        {
+            myTokens2 = new LinkedList<tokens>(myTokens);
+        }
+        /*
+                public static void syntax()
+                {
+
+                    while (myTokens.Count>0)
+                    {
+                        tokens actual = myTokens.First.Value;
+                        myTokens.RemoveFirst();
+                        FirstTokenIdentifier(actual);
+                    }
+                }
+
+                private static void FirstTokenIdentifier(tokens myToken)
+                {
+                    if (level == 0){
+                        if (myToken.id == "integer") {
+
+                        }
+                        else if (myToken.id == "float" || myToken.id == "car") { }
+                        else {
+                            Console.WriteLine("Error near line: " + myToken.noLinea);
+                            errorFlag = true;
+                        }
+                    }
+                }
+
+                private static bool varDecl()
+                {
+                    int toErase;
+                    bool toReturn = true;
+                    foreach(tokens actual in myTokens)
+                    {
+                        if(actual.id== "UserDefined")
+                        {
+                            actual.
+                        }
+                    }
+                    return toReturn;
+                }
+                */
         /*
          * Estructura para almacenar cada linea
          * Y el numero correspondiente de linea
@@ -342,6 +555,28 @@ namespace compiler
             public string id;
             public string myValue;
             public int noLinea;
+        }
+
+        /*
+         * Estructura para almacenar datos
+         * acerca de las declaraciones de usuario
+         */
+        private struct simbols
+        {
+            public string type;
+            public string value;
+            public int lastLine;
+        }
+
+        /*
+         * Estructura para almacenar datos
+         * acerca de las declaraciones de usuario
+         */
+        private struct errors
+        {
+            public string type;
+            public string aprox;
+            public int line;
         }
     }
 }

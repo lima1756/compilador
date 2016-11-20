@@ -1,34 +1,44 @@
-'Esto es un comentario'
+﻿'Esto es un comentario'
 'A partir de aqui mis comentarios van entre comilla simple'
 intel nombre_variable=5. 'Salida->>NONE; Se declara variable de tipo entero denominada nombre_variable igualada a 5'
-estampa{´@intel \@´, nombre_variable}.  'Salida->> 5 @; Se imprime la variable, para identificarla dentro de las dieresis se usa el simbolo de arroba y para imprimir arroba se usa diagonal invertida'
-flot por_escanear. 'Variable tipo flotante declarada denominada por_escanear'
-zy{por_escanear!=0}( 'Declaración de un IF, donde por_escanear sea diferente de cero'
-    zy{por_escanear>0}(
-        estampa{'Mayor a cero'}. 'Salida->> Mayor a cero'
-    )
-    tons(
-        estampa{'Menor a cero'}. 'Salida->> Menor a cero'
-    ) 'Declaración de un IF-ELSE, donde por_escanear sea mayor a cero o se realice el ELSE'
-)
 'Las funciones primero se deben de declarar y hasta despues se pueden usar, si se usan y luego se declaran se marca error'
 intel miFuncion{car unCaracter}(
-    zy{car=´a´}(
+    car micar = ´b´.
+    zy{micar==´a´}(
         por{intel x=0. x<5. x=x+1}( 'Originalmente se usaria el punto y coma entre declaracion del por, pero decidi darme la libertad de cambiarlo'
             estampa(´@intel´, x). 'Imprime el valor de x'
         )
     )
     retornar x. 'uso retornar como palabra clave para el return, pediente de revisión'
 )
-car mi_caracter=´a´.
-miFuncion(mi_caracter).
-mentre{nombre_variable<50}(
-    estampa{'@intel', nombre_variable}.
-    nombre_variable=nombre_variable*2.
+
+intel mifuncion2{}
+(
+	car mi_caracter=´a´.
+	miFuncion(mi_caracter).
+	mentre{nombre_variable<50}(
+	    estampa{'@intel', nombre_variable}.
+	    nombre_variable=nombre_variable*2.
+	)
+	estampa{'\n\n\n\n'}. 'Salida->> \n\n\n\n'
+	to(
+	    estampa{'@intel', nombre_variable}.
+	    nombre_variable=nombre_variable/2.
+	)mentre{nombre_variable>-25}.
+	retornar 0.
 )
-estampa{'\n\n\n\n'}. 'Salida->> \n\n\n\n'
-to(
-    estampa{'@intel', nombre_variable}.
-    nombre_variable=nombre_variable/2.
-)mentre{nombre_variable>-25}.
-FIN_PROGRAMITA
+intel main{}
+(
+	estampa{´@intel \@´, nombre_variable}.  'Salida->> 5 @; Se imprime la variable, para identificarla dentro de las dieresis se usa el simbolo de arroba y para imprimir arroba se usa diagonal invertida'
+	flot por_escanear. 'Variable tipo flotante declarada denominada por_escanear'
+	escanear{´@flot´, &por_escanear}
+	zy{por_escanear!=0}( 'Declaración de un IF, donde por_escanear sea diferente de cero'
+	    zy{por_escanear>0}(
+	        estampa{'Mayor a cero'}. 'Salida->> Mayor a cero'
+	    )
+	    tons(
+	        estampa{'Menor a cero'}. 'Salida->> Menor a cero'
+	    ) 'Declaración de un IF-ELSE, donde por_escanear sea mayor a cero o se realice el ELSE'
+	)
+	retornar 0.
+)

@@ -5,3 +5,10 @@ C:\Users\Luis Iván Morett\Desktop\compiler\compiler\bin\Debug\QUT.ShiftReducePa
 C:\Users\Luis Iván Morett\Desktop\compiler\compiler\obj\Debug\compiler.csprojResolveAssemblyReference.cache
 C:\Users\Luis Iván Morett\Desktop\compiler\compiler\obj\Debug\compiler.exe
 C:\Users\Luis Iván Morett\Desktop\compiler\compiler\obj\Debug\compiler.pdb
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\bin\Debug\compiler.exe.config
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\obj\Debug\compiler.exe
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\obj\Debug\compiler.pdb
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\obj\Debug\compiler.csprojResolveAssemblyReference.cache
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\bin\Debug\compiler.exe
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\bin\Debug\compiler.pdb
+D:\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\bin\Debug\QUT.ShiftReduceParser.dll
