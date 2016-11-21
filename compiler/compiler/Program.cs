@@ -317,17 +317,14 @@ namespace compiler
             if (check)
             {
                 zone = myTokens.First.Next.Value.myValue;
-                while (count > 0)
-                {
-                    myTokens.RemoveFirst();
-                    count -= 1;
-                }
+                tokensRemove(ref count);
                 check = check && listDeclVar();
                 check = check && (myTokens.First.Value.id == "RightBrack");
-                count += 1;
+                myTokens.RemoveFirst();
                 check = check && (myTokens.First.Value.id == "LeftPar");
                 count += 1;
                 tokensRemove(ref count);
+                check = check && statementList();
             }
             count = 0;
             zone = "global";
@@ -566,6 +563,45 @@ namespace compiler
             return check;
         }
 
+
+        public static bool assignOp()
+        {
+            bool check = false;
+            bool semantic = true;
+            simbols another = new simbols();
+            string type="";
+            if (myTokens.First.Value.id == "UserDefined" && myTokens.First.Next.Value.id == "OpAssign")
+            {
+                foreach(simbols key in simbolsTable)
+                {
+                    if (key.id == myTokens.First.Value.myValue && (key.zone == "global" || key.zone == zone))
+                    {
+                        another = key;
+                        another.value = "";
+                        type = key.type;
+                        semantic = true;
+                        break;
+                    }
+                        
+                }
+                if (semantic)
+                {
+                    myTokens.RemoveFirst();
+                    myTokens.RemoveFirst();
+                    check = opExpr(type, ref another);
+                }
+                else
+                {
+                    check = true;
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+        }
+        /*
         private static bool lookSimbols(tokens anotherToken)
         {
             bool semantic = true;
@@ -595,7 +631,7 @@ namespace compiler
             return check;
         }
 
-
+            */
         private static bool statement()
         {
             bool check=false;
@@ -611,18 +647,25 @@ namespace compiler
                     check = varDecl();
                     break;
                 case "UserDefined":
+                    assignOp();
                     break;
                 case "read":
+                    inputOp();
                     break;
                 case "write":
+                    outputOp();
                     break;
                 case "if":
+                    ifCond();
                     break;
                 case "while":
+                    whileLoop();
                     break;
                 case "do":
+                    doWhileLoop();
                     break;
                 case "for":
+                    forLoop();
                     break;
                 default:
                     check = false;
@@ -637,6 +680,30 @@ namespace compiler
                 syntaxError();
             }
             return check;
+        }
+
+        private static bool statementList()
+        {
+            bool check = true;
+            if(myTokens.First.Value.id== "RightPar")
+            {
+                myTokens.RemoveFirst();
+                return true;
+            }
+            else
+            {
+                check = statement() && statementList();
+            }
+            if (!check)
+            {
+                check = statement() && statementList();
+            }
+            return check;
+        }
+
+        private static bool inputOp()
+        {
+            myTokens.RemoveFirst();
         }
 
         private static void syntaxError()
@@ -666,6 +733,16 @@ namespace compiler
             }
         }
 
+        private static void semanticError()
+        {
+            tokensRemoveEOL1();
+            errors newError = new errors();
+            newError.line = myTokens.First.Value.noLinea;
+            newError.type = "Semantic";
+            newError.aprox = myTokens.First.Value.id;
+            errorsTable.AddLast(newError);
+            myTokens.RemoveFirst();
+        }
         /*
          * Estructura para almacenar cada linea
          * Y el numero correspondiente de linea
