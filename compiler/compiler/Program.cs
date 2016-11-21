@@ -652,12 +652,101 @@ namespace compiler
             return check;
         }
 
+        private static bool whileLoop()
+        {
+            bool check = false;
+            tokensRemove(1);
+            if (myTokens.First.Value.id == "LeftBrack")
+            {
+                tokensRemove(1);
+                check = logicOp();
+                if (check && myTokens.First.Value.id == "RightBrack")
+                {
+                    tokensRemove(1);
+                    if (myTokens.First.Value.id == "LeftPar")
+                    {
+                        check = statementList();
+                        if (check && myTokens.First.Value.id == "RightPar")
+                        {
+                            tokensRemove(1);
+                        }
+                        else
+                        {
+                            check = false;
+                        }
+                    }
+                    else
+                    {
+                        check = false;
+                    }
+                }
+                else
+                {
+                    check = false;
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+        }
+
+        private static bool doWhileLoop()
+        {
+            bool check = false;
+            tokensRemove(1);
+            
+                    if (myTokens.First.Value.id == "LeftPar")
+                    {
+                        check = statementList();
+                        if (check && myTokens.First.Value.id == "RightPar" && myTokens.First.Next.Value.id == "while")
+                        {
+                            tokensRemove(2);
+                            if (myTokens.First.Value.id == "LeftBrack")
+                            {
+                                tokensRemove(1);
+                                check = logicOp();
+                                if (check && myTokens.First.Value.id == "RightBrack")
+                                {
+                                    tokensRemove(1);
+                                }
+                                else
+                                {
+                                    check = false;
+                                }
+                            }
+                            else
+                            {
+                                check = false;
+                            }
+                        }
+                        else
+                        {
+                            check = false;
+                        }
+                    }
+                    else
+                    {
+                        check = false;
+                    }
+            
+            return check;
+        }
+
+        private static bool forLoop()
+        {
+            bool check=false;
+            tokensRemove(1);
+            return check;
+        }
+
         private static bool statementList()
         {
             bool check = true;
             if(myTokens.First.Value.id== "RightPar")
             {
-                myTokens.RemoveFirst();
+                tokensRemove(1);
                 return true;
             }
             else
@@ -674,8 +763,8 @@ namespace compiler
         private static bool inputOp()
         {
             bool check = false;
-            myTokens.RemoveFirst();
-            if(myTokens.First.Value.id== "LeftBrack" && myTokens.First.Next.Value.id == "string" 
+            tokensRemove(1);
+            if (myTokens.First.Value.id== "LeftBrack" && myTokens.First.Next.Value.id == "string" 
                 && myTokens.First.Next.Next.Value.id == "COMMA")
             {
                 tokensRemove(3);
@@ -707,7 +796,7 @@ namespace compiler
         private static bool outputOp()
         {
             bool check = false;
-            myTokens.RemoveFirst();
+            tokensRemove(1);
             if (myTokens.First.Value.id == "LeftBrack")
             {
                 tokensRemove(1);
