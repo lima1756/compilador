@@ -734,7 +734,7 @@ namespace compiler
             return check;
         }
 
-        private static bool printOp()
+        private static bool outputOp()
         {
             bool check = false;
             myTokens.RemoveFirst();
