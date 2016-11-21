@@ -703,7 +703,97 @@ namespace compiler
 
         private static bool inputOp()
         {
+            bool check = false;
             myTokens.RemoveFirst();
+            if(myTokens.First.Value.id== "LeftBrack" && myTokens.First.Next.Value.id == "string" 
+                && myTokens.First.Next.Next.Value.id == "COMMA")
+            {
+                tokensRemove(3);
+                check = inVars();
+            }
+            return check;
+        }
+
+        private static bool inVars()
+        {
+            bool check = false;
+            if(myTokens.First.Value.id == "Direction" && myTokens.First.Next.Value.id == "UserDefined")
+            {
+                tokensRemove(2);
+                check = true;
+                if(myTokens.First.Value.id == "COMMA")
+                {
+                    tokensRemove(1);
+                    check = check && inVars();
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+        }
+
+        private static bool printOp()
+        {
+            bool check = false;
+            myTokens.RemoveFirst();
+            if (myTokens.First.Value.id == "LeftBrack")
+            {
+                tokensRemove(1);
+                check = printExpr();
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+
+        }
+
+        private static bool printExpr()
+        {
+            bool check = false;
+            if(myTokens.First.Value.id == "string")
+            {
+                if(myTokens.First.Value.id == "RightBrack")
+                {
+                    check = true;
+                }
+                else if (myTokens.First.Value.id == "COMMA")
+                {
+                    check = printVars();
+                }
+                else
+                {
+                    check = false;
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+        }
+
+        private static bool printVars()
+        {
+            bool check = false;
+            if (myTokens.First.Value.id == "UserDefined")
+            {
+                tokensRemove(1);
+                check = true;
+                if (myTokens.First.Value.id == "COMMA")
+                {
+                    tokensRemove(1);
+                    check = check && printVars();
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
         }
 
         private static void syntaxError()
@@ -716,7 +806,17 @@ namespace compiler
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
         }
+
         private static void tokensRemove(ref int count)
+        {
+            while (count > 0)
+            {
+                myTokens.RemoveFirst();
+                count -= 1;
+            }
+        }
+
+        private static void tokensRemove(int count)
         {
             while (count > 0)
             {
