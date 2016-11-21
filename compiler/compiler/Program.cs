@@ -36,7 +36,7 @@ namespace compiler
             {
                 // Expresión regular para identificar posibles tokens 
                 Match check = Regex.Match(x.linea,
-                    @"(\u00B4((\\\u00B4)|([^\u00B4]))*\u00B4)|(([A-Za-z]+[A-Za-z-_\d]*[A-Za-z\d])|[A-Za-z])|([\(\)\{\}\[\].,])|([\.=\+\-/*])|(&|>=|<=|>|<|==|!|&&|\|\|)|(\d*\.?\d+)|\'.*\'|.");
+                    @"(\u00B4((\\\u00B4)|([^\u00B4]))*\u00B4)|(([A-Za-z]+[A-Za-z-_\d]*[A-Za-z\d])|[A-Za-z])|([\(\)\{\}\[\].,])|(&|>=|<=|>|<|!=|==|!|&&|\|\|)|(\d*\.?\d+)|([\.=\+\-/*])|\'[^\']*\'|.");
                 while (check.Success)
                 {
                     tokens myToken = new tokens();
@@ -129,6 +129,10 @@ namespace compiler
             if (word == "car")
             {
                 return "char";
+            }
+            if (word == "retornar")
+            {
+                return "return";
             }
             if (Regex.IsMatch(word, @"([A-Za-z]+[A-Za-z-_\d]*[A-Za-z\d])|[A-Za-z]"))
             {
@@ -325,21 +329,31 @@ namespace compiler
                 count += 1;
                 tokensRemove(ref count);
                 check = check && statementList();
+                if (check)
+                {
+                    tokensRemove(1);
+                }
             }
             count = 0;
             zone = "global";
-            //myTokens.First.Value.id;
             return check;
         }
 
         public static bool listDeclVar()
         {
             bool check;
-            check = varDecl();
-            if (myTokens.First.Value.id == "COMMA")
+            if (myTokens.First.Value.id != "RightBrack")
             {
-                myTokens.RemoveFirst();
-                check = check && listDeclVar();
+                check = varDecl();
+                if (myTokens.First.Value.id == "COMMA")
+                {
+                    myTokens.RemoveFirst();
+                    check = check && listDeclVar();
+                }
+            }
+            else
+            {
+                check = true;
             }
             return check;
         }
@@ -435,6 +449,11 @@ namespace compiler
                             check = true;
                             break;
                         }
+                        else if (last == "UserDefined" && x.id == "EOL")
+                        {
+                            check = true;
+                            break;
+                        }
                         else
                         {
                             check = false;
@@ -505,7 +524,7 @@ namespace compiler
                 newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
                 last = myTokens.First.Value.id;
                 myTokens.RemoveFirst();
-                for (int x = 0; (myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar") && last != "EOL"; x++)
+                for (int x = 0; (myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar" && myTokens.First.Value.id != "RightBrack") && last != "EOL"; x++)
                 {
                     if (last == "Entero" || last == "Flotante" || last == "UserDefined")
                     {
@@ -617,35 +636,72 @@ namespace compiler
                     check = varDecl();
                     break;
                 case "UserDefined":
-                    assignOp();
+                    if (myTokens.First.Next.Value.id == "LeftBrack")
+                    {
+                        tokensRemove(2);
+                        check = printVars();
+                        if (myTokens.First.Value.id == "EOL")
+                        {
+                            tokensRemove(1);
+                            check = true;
+                        }
+                        else
+                        {
+                            check = false;
+                        }
+                    }
+                    else if(myTokens.First.Next.Value.id == "OpAssign")
+                    {
+                        check = assignOp();
+                    }
+                    else
+                    {
+                        check = false;
+                    }
                     break;
                 case "read":
-                    inputOp();
+                    check = inputOp();
                     break;
                 case "write":
-                    outputOp();
+                    check = outputOp();
                     break;
                 case "if":
-                    ifCond();
+                    check = ifCond();
                     break;
                 case "while":
-                    whileLoop();
+                    check = whileLoop();
                     break;
                 case "do":
-                    doWhileLoop();
+                    check = doWhileLoop();
                     break;
                 case "for":
-                    forLoop();
+                    check = forLoop();
+                    break;
+                case "return":
+                    tokensRemove(1);
+                    if ((myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "UserDefined") && myTokens.First.Next.Value.id == "EOL")
+                    {
+                        tokensRemove(2);
+                        check = true;
+                    }
+                    else
+                    {
+                        check = false;
+                    }
+                    break;
+                case "EOL":
+                    tokensRemove(1);
+                    check = true;
                     break;
                 default:
                     check = false;
                     break;
             } 
-            if (check)
+            if (check && myTokens.First.Value.id == "EOL")
             {
                 myTokens.RemoveFirst();
             }
-            else
+            else if(!check)
             {
                 syntaxError();
             }
@@ -665,6 +721,7 @@ namespace compiler
                     tokensRemove(1);
                     if (myTokens.First.Value.id == "LeftPar")
                     {
+                        tokensRemove(1);
                         check = statementList();
                         if (check && myTokens.First.Value.id == "RightPar")
                         {
@@ -696,25 +753,79 @@ namespace compiler
         {
             bool check = false;
             tokensRemove(1);
-            
-                    if (myTokens.First.Value.id == "LeftPar")
+
+            if (myTokens.First.Value.id == "LeftPar")
+            {
+                tokensRemove(1);
+                check = statementList();
+                if (check && myTokens.First.Value.id == "RightPar" && myTokens.First.Next.Value.id == "while")
+                {
+                    tokensRemove(2);
+                    if (myTokens.First.Value.id == "LeftBrack")
                     {
-                        check = statementList();
-                        if (check && myTokens.First.Value.id == "RightPar" && myTokens.First.Next.Value.id == "while")
+                        tokensRemove(1);
+                        check = logicOp();
+                        if (check && myTokens.First.Value.id == "RightBrack")
+                        {
+                            tokensRemove(1);
+                        }
+                        else
+                        {
+                            check = false;
+                        }
+                    }
+                    else
+                    {
+                        check = false;
+                    }
+                }
+                else
+                {
+                    check = false;
+                }
+            }
+            else
+            {
+                check = false;
+            }
+
+            return check;
+        }
+
+        private static bool forLoop()
+        {
+            bool check=false;
+            tokensRemove(1);
+            if (myTokens.First.Value.id == "LeftBrack")
+            {
+                tokensRemove(1);
+                if (myTokens.First.Value.id == "integer" || myTokens.First.Value.id == "float" || myTokens.First.Value.id == "char")
+                {
+                    check = varDecl();
+                }
+                else if(myTokens.First.Value.id == "UserDefined")
+                {
+                    check = assignOp();
+                }
+                else
+                {
+                    check = false;
+                }
+                if (check && myTokens.First.Value.id == "EOL")
+                {
+                    tokensRemove(1);
+                    check = logicOp();
+                    if (check && myTokens.First.Value.id == "EOL")
+                    {
+                        tokensRemove(1);
+                        check = assignOp();
+                        if (check && myTokens.First.Value.id == "RightBrack" && myTokens.First.Next.Value.id == "LeftPar")
                         {
                             tokensRemove(2);
-                            if (myTokens.First.Value.id == "LeftBrack")
+                            check = statementList();
+                            if(check && myTokens.First.Value.id == "RightPar")
                             {
                                 tokensRemove(1);
-                                check = logicOp();
-                                if (check && myTokens.First.Value.id == "RightBrack")
-                                {
-                                    tokensRemove(1);
-                                }
-                                else
-                                {
-                                    check = false;
-                                }
                             }
                             else
                             {
@@ -730,14 +841,13 @@ namespace compiler
                     {
                         check = false;
                     }
-            
-            return check;
-        }
+                }
+                else
+                {
+                    check = false;
+                }
+            }
 
-        private static bool forLoop()
-        {
-            bool check=false;
-            tokensRemove(1);
             return check;
         }
 
@@ -746,7 +856,6 @@ namespace compiler
             bool check = true;
             if(myTokens.First.Value.id== "RightPar")
             {
-                tokensRemove(1);
                 return true;
             }
             else
@@ -769,6 +878,7 @@ namespace compiler
             {
                 tokensRemove(3);
                 check = inVars();
+                check = check && myTokens.First.Value.id == "EOL";
             }
             return check;
         }
@@ -784,6 +894,15 @@ namespace compiler
                 {
                     tokensRemove(1);
                     check = check && inVars();
+                }
+                else if(myTokens.First.Value.id == "RightBrack")
+                {
+                    tokensRemove(1);
+                    check = true;
+                }
+                else
+                {
+                    check = false;
                 }
             }
             else
@@ -801,6 +920,7 @@ namespace compiler
             {
                 tokensRemove(1);
                 check = printExpr();
+                check = check && myTokens.First.Value.id == "EOL";
             }
             else
             {
@@ -815,12 +935,15 @@ namespace compiler
             bool check = false;
             if(myTokens.First.Value.id == "string")
             {
+                tokensRemove(1);
                 if(myTokens.First.Value.id == "RightBrack")
                 {
+                    tokensRemove(1);
                     check = true;
                 }
                 else if (myTokens.First.Value.id == "COMMA")
                 {
+                    tokensRemove(1);
                     check = printVars();
                 }
                 else
@@ -847,6 +970,11 @@ namespace compiler
                     tokensRemove(1);
                     check = check && printVars();
                 }
+                else if(myTokens.First.Value.id == "RightBrack")
+                {
+                    tokensRemove(1);
+                    check = true;
+                }
             }
             else
             {
@@ -867,7 +995,7 @@ namespace compiler
                 {
                     tokensRemove(2);
                     statementList();
-                    if(myTokens.First.Value.id == "LeftPar")
+                    if(myTokens.First.Value.id == "RightPar")
                     {
                         tokensRemove(1);
                         check = true;
@@ -880,7 +1008,7 @@ namespace compiler
                     {
                         tokensRemove(2);
                         statementList();
-                        if (myTokens.First.Value.id == "LeftPar")
+                        if (myTokens.First.Value.id == "RightPar")
                         {
                             tokensRemove(1);
                             check = true;
@@ -909,7 +1037,7 @@ namespace compiler
             bool check = false;
             last = myTokens.First.Value.id;
             myTokens.RemoveFirst();
-            for (int x = 0; (myTokens.First.Value.id != "RightBrack" && myTokens.First.Value.id != "RightPar") && last != "EOL"; x++)
+            for (int x = 0; (myTokens.First.Value.id != "RightBrack" && myTokens.First.Value.id != "RightPar" && myTokens.First.Value.id != "EOL") && last != "EOL"; x++)
             {
                 if (last == "Entero" || last == "Flotante" || last == "UserDefined" || last == "string")
                 {
@@ -927,11 +1055,16 @@ namespace compiler
                         break;
                     }
                 }
-                else if (myTokens.First.Value.id == "OpAnd" || myTokens.First.Value.id == "OpOr" || myTokens.First.Value.id == "OpNotEqu"
-                        || myTokens.First.Value.id == "OpEqu" || myTokens.First.Value.id == "OpGtEq" || myTokens.First.Value.id == "OpLtEq"
-                        || myTokens.First.Value.id == "OpLt" || myTokens.First.Value.id == "OpGt")
+                else if (last == "OpAnd" || last == "OpOr" || last == "OpNotEqu" || last == "OpEqu" || last == "OpGtEq" || last == "OpLtEq"
+                        || last == "OpLt" || last == "OpGt")
                 {
                     if (myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined" || myTokens.First.Value.id == "string" || myTokens.First.Value.id == "OpNot")
+                    {
+                        last = myTokens.First.Value.id;
+                        myTokens.RemoveFirst();
+                        check = true;
+                    }
+                    else if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus")
                     {
                         last = myTokens.First.Value.id;
                         myTokens.RemoveFirst();
@@ -954,13 +1087,52 @@ namespace compiler
                         break;
                     }
                 }
-                else if (myTokens.First.Value.id == "OpNot")
+                else if (last == "OpNot")
                 {
                     if (myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined" || myTokens.First.Value.id == "string" || myTokens.First.Value.id == "OpNot")
                     {
                         last = myTokens.First.Value.id;
                         myTokens.RemoveFirst();
                         check = true;
+                    }
+                    else
+                    {
+                        check = false;
+                        break;
+                    }
+                }
+                else if (last == "OpAdd" || last == "OpMinus")
+                {
+                    if (myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined")
+                    {
+                        last = myTokens.First.Value.id;
+                        myTokens.RemoveFirst();
+                        check = true;
+                    }
+                    else
+                    {
+                        check = false;
+                        break;
+                    }
+                }
+                else if (last == "OpAdd" || last == "OpMinus" || last == "OpMul" || last == "OpDiv")
+                {
+                    if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined")
+                    {
+                        last = myTokens.First.Value.id;
+                        myTokens.RemoveFirst();
+                        check = true;
+                    }
+                    else if (myTokens.First.Value.id == "LeftPar")
+                    {
+                        myTokens.RemoveFirst();
+                        check = logicOp();
+                        myTokens.RemoveFirst();
+                        last = "Entero";
+                        if (!check)
+                        {
+                            break;
+                        }
                     }
                     else
                     {
@@ -984,7 +1156,6 @@ namespace compiler
             newError.type = "Syntax";
             newError.aprox = myTokens.First.Value.id;
             errorsTable.AddLast(newError);
-            myTokens.RemoveFirst();
         }
 
         private static void tokensRemove(ref int count)
@@ -1007,7 +1178,11 @@ namespace compiler
 
         private static void tokensRemoveEOL1()
         {
-            for (int x = 0; myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar"; x++)
+            for (int x = 0; myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "read"
+                && myTokens.First.Value.id != "write" && myTokens.First.Value.id != "if" && myTokens.First.Value.id != "else"
+                && myTokens.First.Value.id != "while" && myTokens.First.Value.id != "do" && myTokens.First.Value.id != "for"
+                && myTokens.First.Value.id != "integer" && myTokens.First.Value.id != "float" && myTokens.First.Value.id != "char"
+                && myTokens.First.Value.id != "return"; x++)
             {
                 myTokens.RemoveFirst();
             }

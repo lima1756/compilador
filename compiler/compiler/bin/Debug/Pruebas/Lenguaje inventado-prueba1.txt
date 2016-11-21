@@ -16,7 +16,7 @@ intel miFuncion{car unCaracter}(
 intel mifuncion2{}
 (
 	car mi_caracter=´a´.
-	miFuncion(mi_caracter).
+	miFuncion{mi_caracter}.
 	mentre{nombre_variable<50}(
 	    estampa{'@intel', nombre_variable}.
 	    nombre_variable=nombre_variable*2.
