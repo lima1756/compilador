@@ -31,6 +31,7 @@ namespace compiler
                 line.noLinea = ++conteo;
                 allCode.AddLast(line);
             }
+            sr.Close();
             //Lo siguiente sirve para ignorar tabuladores y la tokenización
             foreach (lineas x in allCode)
             {
@@ -482,7 +483,7 @@ namespace compiler
         private static bool opExpr(string type, ref simbols newSymbol)
         {
             bool check=true;
-            string last;
+            string last="";
             if((type == "char" && myTokens.First.Value.id == "string" && myTokens.First.Value.myValue.Length==3) || (type == "char" && myTokens.First.Value.id == "UserDefined"))
             {
                 newSymbol.value = myTokens.First.Value.myValue;
@@ -553,6 +554,10 @@ namespace compiler
                 }
             }
             else
+            {
+                check = false;
+            }
+            if (last == "OpAdd" || last == "OpMinus" || last == "OpMul" || last == "OpDiv")
             {
                 check = false;
             }
@@ -693,6 +698,19 @@ namespace compiler
             {
                 tokensRemove(1);
                 check = logicOp();
+                if (!check)
+                {
+                    for (int x = 0; myTokens.First.Value.id != "RightBrack"; x++) 
+                    {
+                        myTokens.RemoveFirst();
+                    }
+                    errors newError = new errors();
+                    newError.line = myTokens.First.Value.noLinea;
+                    newError.type = "Syntax";
+                    newError.aprox = myTokens.First.Value.id;
+                    errorsTable.AddLast(newError);
+                    check = true;
+                }
                 if (check && myTokens.First.Value.id == "RightBrack")
                 {
                     tokensRemove(1);
@@ -742,6 +760,19 @@ namespace compiler
                     {
                         tokensRemove(1);
                         check = logicOp();
+                        if (!check)
+                        {
+                            for (int x = 0; myTokens.First.Value.id != "RightBrack"; x++)
+                            {
+                                myTokens.RemoveFirst();
+                            }
+                            errors newError = new errors();
+                            newError.line = myTokens.First.Value.noLinea;
+                            newError.type = "Syntax";
+                            newError.aprox = myTokens.First.Value.id;
+                            errorsTable.AddLast(newError);
+                            check = true;
+                        }
                         if (check && myTokens.First.Value.id == "RightBrack")
                         {
                             tokensRemove(1);
@@ -788,14 +819,53 @@ namespace compiler
                 {
                     check = false;
                 }
+                if (!check)
+                {
+                    for (int x = 0; myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightBrack"; x++)
+                    {
+                        myTokens.RemoveFirst();
+                    }
+                    errors newError = new errors();
+                    newError.line = myTokens.First.Value.noLinea;
+                    newError.type = "Syntax";
+                    newError.aprox = myTokens.First.Value.id;
+                    errorsTable.AddLast(newError);
+                    check = true;
+                }
                 if (check && myTokens.First.Value.id == "EOL")
                 {
                     tokensRemove(1);
                     check = logicOp();
+                    if (!check)
+                    {
+                        for (int x = 0; myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightBrack"; x++)
+                        {
+                            myTokens.RemoveFirst();
+                        }
+                        errors newError = new errors();
+                        newError.line = myTokens.First.Value.noLinea;
+                        newError.type = "Syntax";
+                        newError.aprox = myTokens.First.Value.id;
+                        errorsTable.AddLast(newError);
+                        check = true;
+                    }
                     if (check && myTokens.First.Value.id == "EOL")
                     {
                         tokensRemove(1);
                         check = assignOp();
+                        if (!check)
+                        {
+                            for (int x = 0; myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightBrack"; x++)
+                            {
+                                myTokens.RemoveFirst();
+                            }
+                            errors newError = new errors();
+                            newError.line = myTokens.First.Value.noLinea;
+                            newError.type = "Syntax";
+                            newError.aprox = myTokens.First.Value.id;
+                            errorsTable.AddLast(newError);
+                            check = true;
+                        }
                         if (check && myTokens.First.Value.id == "RightBrack" && myTokens.First.Next.Value.id == "LeftPar")
                         {
                             tokensRemove(2);
@@ -813,6 +883,32 @@ namespace compiler
                         {
                             check = false;
                         }
+                    }
+                    else if (check && myTokens.First.Value.id == "RightBrack" && myTokens.First.Next.Value.id == "LeftPar")
+                    {
+                        tokensRemove(2);
+                        check = statementList();
+                        if (check && myTokens.First.Value.id == "RightPar")
+                        {
+                            tokensRemove(1);
+                        }
+                        else
+                        {
+                            check = false;
+                        }
+                    }
+                    else
+                    {
+                        check = false;
+                    }
+                }
+                else if (check && myTokens.First.Value.id == "RightBrack" && myTokens.First.Next.Value.id == "LeftPar")
+                {
+                    tokensRemove(2);
+                    check = statementList();
+                    if (check && myTokens.First.Value.id == "RightPar")
+                    {
+                        tokensRemove(1);
                     }
                     else
                     {
@@ -968,6 +1064,19 @@ namespace compiler
             {
                 tokensRemove(1);
                 check = logicOp();
+                if (!check)
+                {
+                    for (int x = 0; myTokens.First.Value.id != "RightBrack"; x++)
+                    {
+                        myTokens.RemoveFirst();
+                    }
+                    errors newError = new errors();
+                    newError.line = myTokens.First.Value.noLinea;
+                    newError.type = "Syntax";
+                    newError.aprox = myTokens.First.Value.id;
+                    errorsTable.AddLast(newError);
+                    check = true;
+                }
                 if (check && myTokens.First.Value.id == "RightBrack" && myTokens.First.Next.Value.id == "LeftPar")
                 {
                     tokensRemove(2);
@@ -1014,7 +1123,7 @@ namespace compiler
             bool check = false;
             last = myTokens.First.Value.id;
             myTokens.RemoveFirst();
-            for (int x = 0; (myTokens.First.Value.id != "RightBrack" && myTokens.First.Value.id != "RightPar" && myTokens.First.Value.id != "EOL") && last != "EOL"; x++)
+            for (int x = 0; (myTokens.First.Value.id != "RightBrack" && myTokens.First.Value.id != "RightPar" && myTokens.First.Value.id != "EOL") && last != "EOL" && last != "RightBrack"; x++)
             {
                 if (last == "Entero" || last == "Flotante" || last == "UserDefined" || last == "string")
                 {
@@ -1094,7 +1203,8 @@ namespace compiler
                 }
                 else if (last == "OpAdd" || last == "OpMinus" || last == "OpMul" || last == "OpDiv")
                 {
-                    if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined")
+                    if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" 
+                        || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined")
                     {
                         last = myTokens.First.Value.id;
                         myTokens.RemoveFirst();
@@ -1121,6 +1231,11 @@ namespace compiler
                 {
                     check = false;
                 }
+            }
+            if(last == "OpAnd" || last == "OpOr" || last == "OpNotEqu" || last == "OpEqu" || last == "OpGtEq" || last == "OpLtEq"
+                        || last == "OpLt" || last == "OpGt" || last == "OpAdd" || last == "OpMinus" || last == "OpMul" || last == "OpDiv")
+            {
+                check = false;
             }
             return check;
         }

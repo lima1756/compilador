@@ -5,8 +5,8 @@ car persona2=persona.
 'Las funciones primero se deben de declarar y hasta despues se pueden usar, si se usan y luego se declaran se marca error'
 intel miFuncion{car unCaracter}(
     car micar = ´b´.
-    zy{micar==´a´}(
-        por{intel x=0. x<5. x=x+1}( 'Originalmente se usaria el punto y coma entre declaracion del por, pero decidi darme la libertad de cambiarlo'
+    zy{micar}(
+        por{intel. x<5. x=x+1}( 'Originalmente se usaria el punto y coma entre declaracion del por, pero decidi darme la libertad de cambiarlo'
             estampa(´@intel´, x). 'Imprime el valor de x'
         )
     )
@@ -17,7 +17,7 @@ intel mifuncion2{}
 (
 	car mi_caracter=´a´.
 	miFuncion{mi_caracter}.
-	mentre{nombre_variable<50}(
+	mentre{nombre_variable<}(
 	    estampa{'@intel', nombre_variable}.
 	    nombre_variable=nombre_variable*2.
 	)
@@ -25,7 +25,7 @@ intel mifuncion2{}
 	to(
 	    estampa{'@intel', nombre_variable}.
 	    nombre_variable=nombre_variable/2.
-	)mentre{nombre_variable>-25}.
+	)mentre{mi_caracter != ´a´}
 	retornar 0.
 )
 intel main{}
