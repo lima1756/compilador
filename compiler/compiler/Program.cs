@@ -73,6 +73,10 @@ namespace compiler
             newCopy.Clear();
             newCopy = new LinkedList<tokens>(myTokens);
             program();
+            foreach(errors x in errorsTable)
+            {
+                Console.WriteLine(x.aprox + "     " + x.line + "     " + x.type + "     ");
+            }
             Console.ReadKey();
         }
 
@@ -278,33 +282,6 @@ namespace compiler
             if (check && myTokens.First != null)
             {
                 check = check && functionList();
-                /*if (check)
-                {
-                    eq1();
-                }
-                else
-                {
-                    eq2();
-                    for (int x = 0; myTokens.First.Value.id != "EOL" || myTokens.First.Value.id != "RightPar" || myTokens.First.Value.id == null; x++)
-                    {
-                        myTokens.RemoveFirst();
-                    }
-                    errors newError = new errors();
-                    if (myTokens.First.Value.id != null)
-                    {
-                        newError.line = myTokens.First.Value.noLinea;
-                        newError.type = "Syntax";
-                        newError.aprox = myTokens.First.Value.id;
-                        errorsTable.AddLast(newError);
-                    }
-                    else
-                    {
-                        newError.line = -1;
-                        newError.type = "Syntax";
-                        newError.aprox = "EOF";
-                        errorsTable.AddLast(newError);
-                    }
-                }*/
             }
             return check;
         }
