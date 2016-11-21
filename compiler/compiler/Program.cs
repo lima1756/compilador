@@ -601,37 +601,7 @@ namespace compiler
             }
             return check;
         }
-        /*
-        private static bool lookSimbols(tokens anotherToken)
-        {
-            bool semantic = true;
-            bool check = true;
-            foreach (simbols x in simbolsTable)
-            {
-                if(x.id== anotherToken.myValue && (x.zone == zone || x.zone == "global"))
-                {
-                    semantic = true;
-                    break;
-                }
-                else
-                {
-                    semantic = false;
-                }
-            }
-            if (!semantic || simbolsTable.Count==0)
-            {
-                tokensRemoveEOL1();
-                errors newError = new errors();
-                newError.line = myTokens.First.Value.noLinea;
-                newError.type = "Semantic";
-                newError.aprox = myTokens.First.Value.id;
-                errorsTable.AddLast(newError);
-                check = false;
-            }
-            return check;
-        }
 
-            */
         private static bool statement()
         {
             bool check=false;
@@ -792,6 +762,127 @@ namespace compiler
             else
             {
                 check = false;
+            }
+            return check;
+        }
+
+        private static bool ifCond()
+        {
+            bool check = false;
+            tokensRemove(1);
+            if(myTokens.First.Value.id == "LeftBrack")
+            {
+                tokensRemove(1);
+                check = logicOp();
+                if (check && myTokens.First.Value.id == "RightBrack" && myTokens.First.Next.Value.id == "LeftPar")
+                {
+                    tokensRemove(2);
+                    statementList();
+                    if(myTokens.First.Value.id == "LeftPar")
+                    {
+                        tokensRemove(1);
+                        check = true;
+                    }
+                    else
+                    {
+                        check = false;
+                    }
+                    if (myTokens.First.Value.id == "else" && myTokens.First.Next.Value.id == "LeftPar")
+                    {
+                        tokensRemove(2);
+                        statementList();
+                        if (myTokens.First.Value.id == "LeftPar")
+                        {
+                            tokensRemove(1);
+                            check = true;
+                        }
+                        else
+                        {
+                            check = false;
+                        }
+                    }
+                }
+                else
+                {
+                    check = false;
+                }
+            }
+            else
+            {
+                check = false;
+            }
+                return check;
+        }
+        
+        private static bool logicOp()
+        {
+            string last;
+            bool check = false;
+            last = myTokens.First.Value.id;
+            myTokens.RemoveFirst();
+            for (int x = 0; (myTokens.First.Value.id != "RightBrack" && myTokens.First.Value.id != "RightPar") && last != "EOL"; x++)
+            {
+                if (last == "Entero" || last == "Flotante" || last == "UserDefined" || last == "string")
+                {
+                    if (myTokens.First.Value.id == "OpAnd" || myTokens.First.Value.id == "OpOr" || myTokens.First.Value.id == "OpNotEqu" 
+                        || myTokens.First.Value.id == "OpEqu" || myTokens.First.Value.id == "OpGtEq" || myTokens.First.Value.id == "OpLtEq" 
+                        || myTokens.First.Value.id == "OpNot" || myTokens.First.Value.id == "OpLt" || myTokens.First.Value.id == "OpGt")
+                    {
+                        last = myTokens.First.Value.id;
+                        myTokens.RemoveFirst();
+                        check = true;
+                    }
+                    else
+                    {
+                        check = false;
+                        break;
+                    }
+                }
+                else if (myTokens.First.Value.id == "OpAnd" || myTokens.First.Value.id == "OpOr" || myTokens.First.Value.id == "OpNotEqu"
+                        || myTokens.First.Value.id == "OpEqu" || myTokens.First.Value.id == "OpGtEq" || myTokens.First.Value.id == "OpLtEq"
+                        || myTokens.First.Value.id == "OpLt" || myTokens.First.Value.id == "OpGt")
+                {
+                    if (myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined" || myTokens.First.Value.id == "string" || myTokens.First.Value.id == "OpNot")
+                    {
+                        last = myTokens.First.Value.id;
+                        myTokens.RemoveFirst();
+                        check = true;
+                    }
+                    else if (myTokens.First.Value.id == "LeftPar")
+                    {
+                        myTokens.RemoveFirst();
+                        check = logicOp();
+                        myTokens.RemoveFirst();
+                        last = "Entero";
+                        if (!check)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        check = false;
+                        break;
+                    }
+                }
+                else if (myTokens.First.Value.id == "OpNot")
+                {
+                    if (myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined" || myTokens.First.Value.id == "string" || myTokens.First.Value.id == "OpNot")
+                    {
+                        last = myTokens.First.Value.id;
+                        myTokens.RemoveFirst();
+                        check = true;
+                    }
+                    else
+                    {
+                        check = false;
+                        break;
+                    }
+                }
+                else
+                {
+                    check = false;
+                }
             }
             return check;
         }
