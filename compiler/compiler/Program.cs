@@ -254,6 +254,11 @@ namespace compiler
                 myTokens = new LinkedList<tokens>(aux);
                 check = functionList();
             }
+            if(!check && myTokens.Count != 0)
+            {
+                syntaxError();
+                check = program();
+            }
             return check;
         }
 
@@ -307,7 +312,6 @@ namespace compiler
             count += 1;
             check = check && (myTokens.First.Next.Value.id == "UserDefined");
             count += 1;
-            check = lookSimbols(myTokens.First.Next.Value);
             check = check && (myTokens.First.Next.Next.Value.id == "LeftBrack");
             count += 1;
             if (check)
@@ -457,54 +461,60 @@ namespace compiler
         public static bool assignOp(string type)
         {
             bool check;
+            LinkedList<simbols> aux = new LinkedList<simbols>();
             if (myTokens.First.Value.id == "UserDefined" && myTokens.First.Next.Value.id == "OpAssign")
             {
+                simbols another = new simbols();
+                another.id = myTokens.First.Value.myValue;
+                another.lastLine = myTokens.First.Value.noLinea;
+                another.type = type;
+                another.zone = zone;
+                another.value = "";
                 myTokens.RemoveFirst();
                 myTokens.RemoveFirst();
-                check = opExpr(type);
+                check = opExpr(type, ref another);
+                aux.AddLast(another);
             }
             else
             {
                 check = false;
-                tokensRemoveEOL1();
+            }
+            if (check)
+            {
+                simbolsTable.AddLast(aux.Last.Value);
             }
             return check;
         }
 
-        private static bool opExpr(string type)
+        private static bool opExpr(string type, ref simbols newSymbol)
         {
             bool check=true;
-            bool semantic=false;
             string last;
-            if((type == "char" && myTokens.First.Value.id == "char") || (type == "char" && myTokens.First.Value.id == "UserDefined"))
+            if((type == "char" && myTokens.First.Value.id == "string" && myTokens.First.Value.myValue.Length==3) || (type == "char" && myTokens.First.Value.id == "UserDefined"))
             {
-                if(myTokens.First.Value.id == "UserDefined")
+                newSymbol.value = myTokens.First.Value.myValue;
+                myTokens.RemoveFirst();
+                if (myTokens.First.Value.id == "EOL")
                 {
-                    
+                    check = true;
                 }
-                if (semantic || myTokens.First.Value.id != "UserDefined")
+                else
                 {
-                    myTokens.RemoveFirst();
-                    if (myTokens.First.Value.id == "EOL")
-                    {
-                        check = true;
-                    }
-                    else
-                    {
-                        check = false;
-                    }
+                    check = false;
                 }
             }
             else if(type =="integer" || type == "float" || type == "UserDefined")
             {
+                newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
                 last = myTokens.First.Value.id;
                 myTokens.RemoveFirst();
                 for (int x = 0; (myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar") && last != "EOL"; x++)
                 {
-                    if (last == "Entero" || last == "Flotante")
+                    if (last == "Entero" || last == "Flotante" || last == "UserDefined")
                     {
                         if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "OpMul" || myTokens.First.Value.id == "OpDiv")
                         {
+                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
                             last = myTokens.First.Value.id;
                             myTokens.RemoveFirst();
                             check = true;
@@ -515,18 +525,21 @@ namespace compiler
                             break;
                         }
                     }
-                    else if (last == "OpAdd" || last == "OpMinus" || myTokens.First.Value.id == "OpMul" || myTokens.First.Value.id == "OpDiv")
+                    else if (last == "OpAdd" || last == "OpMinus" || last == "OpMul" || last == "OpDiv")
                     {
-                        if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante")
+                        if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined")
                         {
+                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
                             last = myTokens.First.Value.id;
                             myTokens.RemoveFirst();
                             check = true;
                         }
                         else if(myTokens.First.Value.id== "LeftPar")
                         {
+                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
                             myTokens.RemoveFirst();
-                            check = opExpr(type);
+                            check = opExpr(type, ref newSymbol);
+                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
                             myTokens.RemoveFirst();
                             last = "Entero";
                             if (!check)
@@ -569,7 +582,7 @@ namespace compiler
                     semantic = false;
                 }
             }
-            if (!semantic)
+            if (!semantic || simbolsTable.Count==0)
             {
                 tokensRemoveEOL1();
                 errors newError = new errors();
@@ -581,6 +594,7 @@ namespace compiler
             }
             return check;
         }
+
 
         private static bool statement()
         {
@@ -633,6 +647,7 @@ namespace compiler
             newError.type = "Syntax";
             newError.aprox = myTokens.First.Value.id;
             errorsTable.AddLast(newError);
+            myTokens.RemoveFirst();
         }
         private static void tokensRemove(ref int count)
         {
@@ -651,47 +666,6 @@ namespace compiler
             }
         }
 
-
-        /*
-                public static void syntax()
-                {
-
-                    while (myTokens.Count>0)
-                    {
-                        tokens actual = myTokens.First.Value;
-                        myTokens.RemoveFirst();
-                        FirstTokenIdentifier(actual);
-                    }
-                }
-
-                private static void FirstTokenIdentifier(tokens myToken)
-                {
-                    if (level == 0){
-                        if (myToken.id == "integer") {
-
-                        }
-                        else if (myToken.id == "float" || myToken.id == "car") { }
-                        else {
-                            Console.WriteLine("Error near line: " + myToken.noLinea);
-                            errorFlag = true;
-                        }
-                    }
-                }
-
-                private static bool varDecl()
-                {
-                    int toErase;
-                    bool toReturn = true;
-                    foreach(tokens actual in myTokens)
-                    {
-                        if(actual.id== "UserDefined")
-                        {
-                            actual.
-                        }
-                    }
-                    return toReturn;
-                }
-                */
         /*
          * Estructura para almacenar cada linea
          * Y el numero correspondiente de linea

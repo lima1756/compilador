@@ -1,6 +1,7 @@
 ﻿'Esto es un comentario'
 'A partir de aqui mis comentarios van entre comilla simple'
-intel nombre_variable=5. 'Salida->>NONE; Se declara variable de tipo entero denominada nombre_variable igualada a 5'
+intel nombre_variable=5+var/8*-(5+2/3). 'Salida->>NONE; Se declara variable de tipo entero denominada nombre_variable igualada a 5'
+car persona2=persona.
 'Las funciones primero se deben de declarar y hasta despues se pueden usar, si se usan y luego se declaran se marca error'
 intel miFuncion{car unCaracter}(
     car micar = ´b´.
