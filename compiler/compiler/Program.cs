@@ -8,18 +8,20 @@ namespace compiler
     {
         private static LinkedList<tokens> myTokens;                // Almacena todos los tokens del codigo
         private static string zone;                                // Almacena ubicación actual para identificarlo en la tabla de simbolos
-        private static LinkedList<simbols> simbolsTable;           // Equivale a mi tabla de simbolos
-        private static LinkedList<errors> errorsTable;             // Representa mi tabla de errores
+        private static LinkedList<simbols> simbolsTable;           // Equivale a la tabla de simbolos
+        private static LinkedList<errors> errorsTable;             // Representa la tabla de errores
+        private static LinkedList<string> functions;               //Lista de funciones ya declaradas, solo se puede llamar una función si fue declarada previamente
 
         static void Main(string[] args)
         {
             LinkedList<lineas> allCode = new LinkedList<lineas>();
+            functions = new LinkedList<string>();
             myTokens = new LinkedList<tokens>();
             simbolsTable = new LinkedList<simbols>();
             errorsTable = new LinkedList<errors>();
             LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
             int conteo = 0;                                                 // Conteo auxiliar
-            string path = @"Pruebas\Lenguaje inventado-prueba1.txt";       //Path donde leera el archivo a compilar
+            string path = @"Pruebas\prueba2.txt";       //Path donde leera el archivo a compilar
             zone = "global";
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
@@ -143,10 +145,6 @@ namespace compiler
             {
                 return "UserDefined";
             }
-            if (Regex.IsMatch(word, @"\."))
-            {
-                return "EOL";
-            }
             if (Regex.IsMatch(word, @","))
             {
                 return "COMMA";
@@ -240,6 +238,10 @@ namespace compiler
             {
                 return "WhiteSpace";
             }
+            if (Regex.IsMatch(word, @"\."))
+            {
+                return "EOL";
+            }
             return "ERROR";
         }
 
@@ -252,21 +254,29 @@ namespace compiler
         {
             bool check;
             LinkedList<tokens> aux = new LinkedList<tokens>(myTokens);
-            check = varDecl();
-            if (check)
+            if (myTokens.Count > 0)
             {
-                myTokens.RemoveFirst();
-                check = check && program();
+                check = varDecl();
+                if (check)
+                {
+                    myTokens.RemoveFirst();
+                    check = check && program();
+                }
+                else
+                {
+                    myTokens = new LinkedList<tokens>(aux);
+                    check = functionList();
+                }
+                if (!check && myTokens.Count != 0)
+                {
+                    syntaxError();
+                    tokensRemove(1);
+                    check = program();
+                }
             }
             else
             {
-                myTokens = new LinkedList<tokens>(aux);
-                check = functionList();
-            }
-            if(!check && myTokens.Count != 0)
-            {
-                syntaxError();
-                check = program();
+                check = true;
             }
             return check;
         }
@@ -293,6 +303,7 @@ namespace compiler
             bool check = myTokens.First.Value.id == "integer";
             count += 1;
             check = check && (myTokens.First.Next.Value.id == "UserDefined");
+            functions.AddLast(myTokens.First.Next.Value.myValue);
             count += 1;
             check = check && (myTokens.First.Next.Next.Value.id == "LeftBrack");
             count += 1;
@@ -620,16 +631,27 @@ namespace compiler
                 case "UserDefined":
                     if (myTokens.First.Next.Value.id == "LeftBrack")
                     {
-                        tokensRemove(2);
-                        check = printVars();
-                        if (myTokens.First.Value.id == "EOL")
+                        foreach(string fun in functions)
                         {
-                            tokensRemove(1);
-                            check = true;
+                            if(fun == myTokens.First.Value.myValue)
+                            {
+                                check = true;
+                                break;
+                            }
                         }
-                        else
+                        if (check)
                         {
-                            check = false;
+                            tokensRemove(2);
+                            check = printVars();
+                            if (myTokens.First.Value.id == "EOL")
+                            {
+                                tokensRemove(1);
+                                check = true;
+                            }
+                            else
+                            {
+                                check = false;
+                            }
                         }
                     }
                     else if(myTokens.First.Next.Value.id == "OpAssign")
