@@ -259,7 +259,13 @@ namespace compiler
                 check = varDecl();
                 if (check)
                 {
-                    myTokens.RemoveFirst();
+                    if (myTokens.Count > 0)
+                    {
+                        if (myTokens.First.Value.id == "EOL")
+                        {
+                            myTokens.RemoveFirst();
+                        }
+                    }
                     check = check && program();
                 }
                 else
@@ -474,7 +480,7 @@ namespace compiler
                 another.lastLine = myTokens.First.Value.noLinea;
                 another.type = type;
                 another.zone = zone;
-                another.value = "";
+                another.value = new LinkedList<tokens>(); ;
                 myTokens.RemoveFirst();
                 myTokens.RemoveFirst();
                 check = opExpr(type, ref another);
@@ -486,6 +492,7 @@ namespace compiler
             }
             if (check)
             {
+                checkSimbol(aux.Last.Value);
                 simbolsTable.AddLast(aux.Last.Value);
             }
             return check;
@@ -497,7 +504,7 @@ namespace compiler
             string last="";
             if((type == "char" && myTokens.First.Value.id == "string" && myTokens.First.Value.myValue.Length==3) || (type == "char" && myTokens.First.Value.id == "UserDefined"))
             {
-                newSymbol.value = myTokens.First.Value.myValue;
+                newSymbol.value.AddLast(myTokens.First.Value);
                 myTokens.RemoveFirst();
                 if (myTokens.First.Value.id == "EOL")
                 {
@@ -510,7 +517,7 @@ namespace compiler
             }
             else if(type =="integer" || type == "float" || type == "UserDefined")
             {
-                newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
+                newSymbol.value.AddLast(myTokens.First.Value);
                 last = myTokens.First.Value.id;
                 myTokens.RemoveFirst();
                 for (int x = 0; (myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar" && myTokens.First.Value.id != "RightBrack") && last != "EOL"; x++)
@@ -519,7 +526,7 @@ namespace compiler
                     {
                         if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "OpMul" || myTokens.First.Value.id == "OpDiv")
                         {
-                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
+                            newSymbol.value.AddLast(myTokens.First.Value);
                             last = myTokens.First.Value.id;
                             myTokens.RemoveFirst();
                             check = true;
@@ -534,17 +541,17 @@ namespace compiler
                     {
                         if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined")
                         {
-                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
+                            newSymbol.value.AddLast(myTokens.First.Value);
                             last = myTokens.First.Value.id;
                             myTokens.RemoveFirst();
                             check = true;
                         }
                         else if(myTokens.First.Value.id== "LeftPar")
                         {
-                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
+                            newSymbol.value.AddLast(myTokens.First.Value);
                             myTokens.RemoveFirst();
                             check = opExpr(type, ref newSymbol);
-                            newSymbol.value = newSymbol.value + myTokens.First.Value.myValue;
+                            newSymbol.value.AddLast(myTokens.First.Value);
                             myTokens.RemoveFirst();
                             last = "Entero";
                             if (!check)
@@ -589,7 +596,7 @@ namespace compiler
                     if (key.id == myTokens.First.Value.myValue && (key.zone == "global" || key.zone == zone))
                     {
                         another = key;
-                        another.value = "";
+                        another.value = new LinkedList<tokens>();
                         type = key.type;
                         semantic = true;
                         break;
@@ -601,17 +608,18 @@ namespace compiler
                     myTokens.RemoveFirst();
                     myTokens.RemoveFirst();
                     check = opExpr(type, ref another);
+                    checkSimbol(another);
                 }
                 else
                 {
-                    check = true;
+                    check = false;
                 }
             }
             else
             {
                 check = false;
             }
-            return check;
+            return check;            
         }
 
         private static bool statement()
@@ -1302,12 +1310,124 @@ namespace compiler
             }
         }
 
+        /*
+         * Inicio del analizadir semantico
+         * Lo que hace falta que no se analizo junto al sintactico
+         * o partes que se llaman en el sintactico
+         */
+
+        private static bool checkSimbol(simbols x)
+        {
+            bool check = false;
+            if (x.type == "char")
+            {
+                foreach(tokens iT in x.value)
+                {
+                    if(iT.id != "string" && iT.id.Length != 1 && iT.id != "UserDefined")
+                    {
+                        semanticError("Expresión para el tipo de variable declarada incorrecta");
+                        check = false;
+                        break;
+                    }
+                    else if(iT.id == "UserDefined")
+                    {
+                        foreach(simbols z in simbolsTable)
+                        {
+                            if (z.id == iT.myValue)
+                            {
+                                if (z.zone != zone && z.zone != "global")
+                                {
+                                    semanticError("La variable " + iT.myValue + " no ha sido declarada", iT);
+                                    check = false;
+                                    break;
+                                }
+                                else if (z.type != "char")
+                                {
+                                    semanticError("La variable " + iT.myValue + " no es del tipo correcto", iT);
+                                    check = false;
+                                    break;
+                                }
+                                else
+                                {
+                                    check = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if(x.type == "float" || x.type=="integer")
+            {
+                foreach (tokens iT in x.value)
+                {
+                    if (iT.id != "Entero" && iT.id != "Flotante" && iT.id != "UserDefined" && iT.id != "OpAdd" && iT.id != "OpMinus" && iT.id != "OpMul" 
+                        && iT.id != "OpDiv" && iT.id != "LeftPar" && iT.id != "RightPar")
+                    {
+                        semanticError("Expresión para el tipo de variable declarada incorrecta");
+                        check = false;
+                        break;
+                    }
+                    else if (iT.id == "UserDefined")
+                    {
+                        foreach (simbols abc in simbolsTable)
+                        {
+                            if (abc.id == iT.myValue)
+                            {
+                                if (abc.zone != zone && abc.zone != "global")
+                                {
+                                    semanticError("La variable " + iT.myValue + " no ha sido declarada", iT);
+                                    check = false;
+                                    break;
+                                }
+                                else if (abc.type != "integer" && abc.type != "float")
+                                {
+                                    semanticError("La variable " + iT.myValue + " no es del tipo correcto", iT);
+                                    check = false;
+                                    break;
+                                }
+                                else
+                                {
+                                    check = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+        }
         private static void semanticError()
         {
             tokensRemoveEOL1();
             errors newError = new errors();
             newError.line = myTokens.First.Value.noLinea;
             newError.type = "Semantic";
+            newError.aprox = myTokens.First.Value.id;
+            errorsTable.AddLast(newError);
+            myTokens.RemoveFirst();
+        }
+        private static void semanticError(string error)
+        {
+            tokensRemoveEOL1();
+            errors newError = new errors();
+            newError.line = myTokens.First.Value.noLinea;
+            newError.type = error;
+            newError.aprox = myTokens.First.Value.id;
+            errorsTable.AddLast(newError);
+            myTokens.RemoveFirst();
+        }
+        private static void semanticError(string error, tokens near)
+        {
+            tokensRemoveEOL1();
+            errors newError = new errors();
+            newError.line = near.noLinea;
+            newError.type = error;
             newError.aprox = myTokens.First.Value.id;
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
@@ -1339,8 +1459,8 @@ namespace compiler
          */
         private struct simbols
         {
+            public LinkedList<tokens> value;
             public string type;
-            public string value;
             public int lastLine;
             public string id;
             public string zone;
