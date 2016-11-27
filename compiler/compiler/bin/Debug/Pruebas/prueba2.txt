@@ -1,4 +1,11 @@
-﻿intel nombre = 5.
-car x = ´a´.
-flot i=126.5+2.
-car z = i.
+﻿intel nombre_variable=5+var/8*-(5+2/3).
+car persona2=persona.
+intel miFuncion{car unCaracter}(
+    car micar = ´b´.
+    zy{nombre_variable<6}(
+        por{intel x. x<5. x=x+1}( 
+            estampa{´@intel´, x}.
+        )
+    )
+    retornar x.
+)

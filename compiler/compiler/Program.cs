@@ -26,6 +26,7 @@ namespace compiler
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
             string[] codelines = Regex.Split(code, @"\n |\r |\n\r |\r\n"); //Separa el codigo en lineas
+            int last = 0;                                                   //Variable que almacenara el valor de la ultima linea
             foreach (string x in codelines)
             {
                 lineas line = new lineas();
@@ -58,12 +59,13 @@ namespace compiler
                 {
                     errors newError = new errors();
                     newError.line = x.noLinea;
-                    newError.type = "Lexical";
-                    newError.aprox = x.id;
+                    newError.type = "Lexico, simbolo no detectado";
+                    newError.aprox = x.myValue;
                     errorsTable.AddLast(newError);
                     //Se deben de agregar los errores a una tabla de errores para que se impriman al final todos los conjuntos de errores en orden de lineas
                 }
             }
+            last = myTokens.Last.Value.noLinea;
             newCopy = new LinkedList<tokens>(myTokens);
             myTokens.Clear();
             foreach (tokens x in newCopy)
@@ -76,9 +78,22 @@ namespace compiler
             newCopy.Clear();
             newCopy = new LinkedList<tokens>(myTokens);
             program();
-            foreach(errors x in errorsTable)
+            if (errorsTable.Count > 0)
             {
-                Console.WriteLine(x.aprox + "     " + x.line + "     " + x.type + "     ");
+                for (int z = 1; z <= last; z++)
+                {
+                    foreach (errors x in errorsTable)
+                    {
+                        if (x.line == z)
+                        {
+                            Console.WriteLine("Linea: " + x.line + "\t\tDescripcion: " + x.type + "\t\tCerca de: " + x.aprox);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //Aqui iria la función para el traductor
             }
             Console.ReadKey();
         }
@@ -308,26 +323,40 @@ namespace compiler
             int count = 0;
             bool check = myTokens.First.Value.id == "integer";
             count += 1;
-            check = check && (myTokens.First.Next.Value.id == "UserDefined");
-            functions.AddLast(myTokens.First.Next.Value.myValue);
-            count += 1;
-            check = check && (myTokens.First.Next.Next.Value.id == "LeftBrack");
-            count += 1;
             if (check)
             {
-                zone = myTokens.First.Next.Value.myValue;
-                tokensRemove(ref count);
-                check = check && listDeclVar();
-                check = check && (myTokens.First.Value.id == "RightBrack");
-                myTokens.RemoveFirst();
-                check = check && (myTokens.First.Value.id == "LeftPar");
+                check = check && (myTokens.First.Next.Value.id == "UserDefined");
+                functions.AddLast(myTokens.First.Next.Value.myValue);
                 count += 1;
-                tokensRemove(ref count);
-                check = check && statementList();
                 if (check)
                 {
-                    tokensRemove(1);
+                    check = check && (myTokens.First.Next.Next.Value.id == "LeftBrack");
+                    count += 1;
+                    if (check)
+                    {
+                        zone = myTokens.First.Next.Value.myValue;
+                        tokensRemove(ref count);
+                        check = check && listDeclVar();
+                        check = check && (myTokens.First.Value.id == "RightBrack");
+                        myTokens.RemoveFirst();
+                        check = check && (myTokens.First.Value.id == "LeftPar");
+                        count += 1;
+                        tokensRemove(ref count);
+                        check = check && statementList();
+                        if (check)
+                        {
+                            tokensRemove(1);
+                        }
+                    }
                 }
+                else
+                {
+                    tokensRemove(count);
+                }
+            }
+            else
+            {
+                tokensRemove(count);
             }
             count = 0;
             zone = "global";
@@ -512,7 +541,9 @@ namespace compiler
                 }
                 else
                 {
-                    check = false;
+                    semanticError("Error en tipo y su valor", myTokens.First.Value);
+                    tokensRemoveEOL1();
+                    check = true;
                 }
             }
             else if(type =="integer" || type == "float" || type == "UserDefined")
@@ -737,7 +768,7 @@ namespace compiler
                     errors newError = new errors();
                     newError.line = myTokens.First.Value.noLinea;
                     newError.type = "Syntax";
-                    newError.aprox = myTokens.First.Value.id;
+                    newError.aprox = myTokens.First.Value.myValue;
                     errorsTable.AddLast(newError);
                     check = true;
                 }
@@ -799,7 +830,7 @@ namespace compiler
                             errors newError = new errors();
                             newError.line = myTokens.First.Value.noLinea;
                             newError.type = "Syntax";
-                            newError.aprox = myTokens.First.Value.id;
+                            newError.aprox = myTokens.First.Value.myValue;
                             errorsTable.AddLast(newError);
                             check = true;
                         }
@@ -858,7 +889,7 @@ namespace compiler
                     errors newError = new errors();
                     newError.line = myTokens.First.Value.noLinea;
                     newError.type = "Syntax";
-                    newError.aprox = myTokens.First.Value.id;
+                    newError.aprox = myTokens.First.Value.myValue;
                     errorsTable.AddLast(newError);
                     check = true;
                 }
@@ -875,7 +906,7 @@ namespace compiler
                         errors newError = new errors();
                         newError.line = myTokens.First.Value.noLinea;
                         newError.type = "Syntax";
-                        newError.aprox = myTokens.First.Value.id;
+                        newError.aprox = myTokens.First.Value.myValue;
                         errorsTable.AddLast(newError);
                         check = true;
                     }
@@ -892,7 +923,7 @@ namespace compiler
                             errors newError = new errors();
                             newError.line = myTokens.First.Value.noLinea;
                             newError.type = "Syntax";
-                            newError.aprox = myTokens.First.Value.id;
+                            newError.aprox = myTokens.First.Value.myValue;
                             errorsTable.AddLast(newError);
                             check = true;
                         }
@@ -1087,7 +1118,7 @@ namespace compiler
         }
 
         private static bool ifCond()
-        {
+        { 
             bool check = false;
             tokensRemove(1);
             if(myTokens.First.Value.id == "LeftBrack")
@@ -1103,7 +1134,7 @@ namespace compiler
                     errors newError = new errors();
                     newError.line = myTokens.First.Value.noLinea;
                     newError.type = "Syntax";
-                    newError.aprox = myTokens.First.Value.id;
+                    newError.aprox = myTokens.First.Value.myValue;
                     errorsTable.AddLast(newError);
                     check = true;
                 }
@@ -1276,7 +1307,7 @@ namespace compiler
             errors newError = new errors();
             newError.line = myTokens.First.Value.noLinea;
             newError.type = "Syntax";
-            newError.aprox = myTokens.First.Value.id;
+            newError.aprox = myTokens.First.Value.myValue;
             errorsTable.AddLast(newError);
         }
 
@@ -1408,7 +1439,7 @@ namespace compiler
             errors newError = new errors();
             newError.line = myTokens.First.Value.noLinea;
             newError.type = "Semantic";
-            newError.aprox = myTokens.First.Value.id;
+            newError.aprox = myTokens.First.Value.myValue;
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
         }
@@ -1418,7 +1449,7 @@ namespace compiler
             errors newError = new errors();
             newError.line = myTokens.First.Value.noLinea;
             newError.type = error;
-            newError.aprox = myTokens.First.Value.id;
+            newError.aprox = myTokens.First.Value.myValue;
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
         }
@@ -1428,7 +1459,7 @@ namespace compiler
             errors newError = new errors();
             newError.line = near.noLinea;
             newError.type = error;
-            newError.aprox = myTokens.First.Value.id;
+            newError.aprox = myTokens.First.Value.myValue;
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
         }
@@ -1467,8 +1498,8 @@ namespace compiler
         }
 
         /*
-         * Estructura para almacenar datos
-         * acerca de las declaraciones de usuario
+         * Estructura para almacenar información
+         * de los errores en el codigo
          */
         private struct errors
         {
