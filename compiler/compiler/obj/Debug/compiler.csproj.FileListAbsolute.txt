@@ -19,3 +19,6 @@ C:\Users\luisi\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Ter
 C:\Users\luisi\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\compiler\compiler\bin\Debug\compiler.pdb
 C:\Users\luisi\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\compiler\compiler\bin\Debug\QUT.ShiftReduceParser.dll
 C:\Users\luisi\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compilador\compiler\compiler\obj\Debug\compiler.csprojResolveAssemblyReference.cache
+C:\Users\luisi\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\bin\Debug\compiler.exe.config
+C:\Users\luisi\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\obj\Debug\compiler.exe
+C:\Users\luisi\OneDrive\CETI\7 - Septimo Semestre\Compiladores e Interpretes\Tercer Parcial\compilador\compiler\compiler\obj\Debug\compiler.pdb
