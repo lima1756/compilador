@@ -6,7 +6,7 @@ char persona2=persona;
 int main(){
 char micar='b';
 if(nombre_variable<6){
-for(int x;
+for(int x=0;
 x<5;
 x=x+1)
 {

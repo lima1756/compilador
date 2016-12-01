@@ -5,7 +5,7 @@ car persona2=persona.
 intel main{}(
     car micar = ´b´.
     zy{nombre_variable<6}(
-        por{intel x. x<5. x=x+1}( 
+        por{intel x=0. x<5. x=x+1}( 
             estampa{´@intel´, x}.
         )
     )

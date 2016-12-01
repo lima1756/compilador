@@ -12,6 +12,7 @@ namespace compiler
         private static LinkedList<errors> errorsTable;             // Representa la tabla de errores
         private static LinkedList<string> functions;               //Lista de funciones ya declaradas, solo se puede llamar una función si fue declarada previamente
         private static string path;                                //Almacena el directorio del archivo
+        private static bool retornar;
 
         static void Main(string[] args)
         {
@@ -22,7 +23,7 @@ namespace compiler
             errorsTable = new LinkedList<errors>();
             LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
             int conteo = 0;                                                 // Conteo auxiliar
-            path = @"Pruebas\prueba2.txt";                                  //Path donde leera el archivo a compilar
+            path = @"Pruebas\Lenguaje inventado-prueba1.txt";                                  //Path donde leera el archivo a compilar
             zone = "global";
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
@@ -81,6 +82,7 @@ namespace compiler
             program();
             if (errorsTable.Count > 0)
             {
+                Console.WriteLine("ERRORES: ");
                 for (int z = 1; z <= last; z++)
                 {
                     foreach (errors x in errorsTable)
@@ -98,7 +100,7 @@ namespace compiler
                 translator();
                 //Aqui iria la función para el traductor
             }
-            Console.WriteLine("Todo correcto :D. Presione una tecla para continuar.");
+                Console.WriteLine("Todo correcto :D. Presione una tecla para continuar.");
             Console.ReadKey();
         }
 
@@ -346,8 +348,13 @@ namespace compiler
                         check = check && (myTokens.First.Value.id == "LeftPar");
                         count += 1;
                         tokensRemove(ref count);
+                        retornar = false;
                         check = check && statementList();
-                        if (check)
+                        if (!retornar)
+                        {
+                            semanticError("Falta retornar algo", myTokens.First.Value);
+                        }
+                        if (check && retornar)
                         {
                             tokensRemove(1);
                         }
@@ -415,6 +422,34 @@ namespace compiler
                     check2 = assignOp(type);
                 }
                 check = check || check2;
+            }
+            else
+            {
+                check = false;
+            }
+            return check;
+        }
+
+        public static bool varDeclFor()
+        {
+            bool check;
+            string type = "";
+            if (myTokens.First.Value.id == "integer")
+            {
+                type = "integer";
+            }
+            else if (myTokens.First.Value.id == "char")
+            {
+                type = "char";
+            }
+            else if (myTokens.First.Value.id == "float")
+            {
+                type = "float";
+            }
+            if (type != "")
+            {
+                myTokens.RemoveFirst();
+                check = assignOp(type);
             }
             else
             {
@@ -685,6 +720,9 @@ namespace compiler
                     myTokens.RemoveFirst();
                     check = opExpr(type, ref another);
                     checkSimbol(another);
+                    if (another.id == null) {
+                        check = false;
+                    }
                 }
                 else
                 {
@@ -769,7 +807,27 @@ namespace compiler
                     tokensRemove(1);
                     if ((myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "UserDefined") && myTokens.First.Next.Value.id == "EOL")
                     {
-                        tokensRemove(2);
+                        bool rev = true;
+                        if (myTokens.First.Value.id == "UserDefined")
+                        {
+                            rev = false;
+                            foreach(simbols x in simbolsTable)
+                            {
+                                if (x.id == myTokens.First.Value.myValue && (x.zone == "global" || x.zone == "zone") && x.type == "integer")
+                                {
+                                    rev = true;
+                                }
+                            }
+                        }
+                        if (rev)
+                        {
+                            tokensRemove(2);
+                        }
+                        else
+                        {
+                            semanticError("Tipo de dato retornado incorrecto o desconocido");
+                        }
+                        retornar = true;
                         check = true;
                     }
                     else
@@ -879,7 +937,7 @@ namespace compiler
                             errorsTable.AddLast(newError);
                             check = true;
                         }
-                        if (check && myTokens.First.Value.id == "RightBrack")
+                        if (check && myTokens.First.Value.id == "RightBrack" && myTokens.First.Next.Value.id == "EOL")
                         {
                             tokensRemove(1);
                         }
@@ -915,7 +973,7 @@ namespace compiler
                 tokensRemove(1);
                 if (myTokens.First.Value.id == "integer" || myTokens.First.Value.id == "float" || myTokens.First.Value.id == "char")
                 {
-                    check = varDecl();
+                    check = varDeclFor();
                 }
                 else if(myTokens.First.Value.id == "UserDefined")
                 {
