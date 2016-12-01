@@ -655,6 +655,7 @@ namespace compiler
             {
                 check = false;
             }
+            check = !rev || check;
             return check;
         }
             check = !rev || check;
