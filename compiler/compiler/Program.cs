@@ -98,9 +98,9 @@ namespace compiler
             {
                 myTokens = new LinkedList<tokens>(newCopy);
                 translator();
+                Console.WriteLine("Todo correcto :D. Presione una tecla para continuar.");
                 //Aqui iria la función para el traductor
             }
-                Console.WriteLine("Todo correcto :D. Presione una tecla para continuar.");
             Console.ReadKey();
         }
 
