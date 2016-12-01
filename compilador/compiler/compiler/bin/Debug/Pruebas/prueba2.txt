@@ -1,0 +1,4 @@
+﻿intel nombre = 5.
+car x = ´a´.
+flot i=126.5+2.
+car z = i.

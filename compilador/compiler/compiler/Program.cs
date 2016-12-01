@@ -11,7 +11,6 @@ namespace compiler
         private static LinkedList<simbols> simbolsTable;           // Equivale a la tabla de simbolos
         private static LinkedList<errors> errorsTable;             // Representa la tabla de errores
         private static LinkedList<string> functions;               //Lista de funciones ya declaradas, solo se puede llamar una función si fue declarada previamente
-        private static string path;                                //Almacena el directorio del archivo
 
         static void Main(string[] args)
         {
@@ -22,12 +21,11 @@ namespace compiler
             errorsTable = new LinkedList<errors>();
             LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
             int conteo = 0;                                                 // Conteo auxiliar
-            path = @"Pruebas\prueba2.txt";                                  //Path donde leera el archivo a compilar
+            string path = @"Pruebas\prueba2.txt";       //Path donde leera el archivo a compilar
             zone = "global";
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();
             string[] codelines = Regex.Split(code, @"\n |\r |\n\r |\r\n"); //Separa el codigo en lineas
-            int last = 0;                                                  //Variable que almacenara el valor de la ultima linea
             foreach (string x in codelines)
             {
                 lineas line = new lineas();
@@ -60,45 +58,28 @@ namespace compiler
                 {
                     errors newError = new errors();
                     newError.line = x.noLinea;
-                    newError.type = "Lexico, simbolo no detectado";
-                    newError.aprox = x.myValue;
+                    newError.type = "Lexical";
+                    newError.aprox = x.id;
                     errorsTable.AddLast(newError);
                     //Se deben de agregar los errores a una tabla de errores para que se impriman al final todos los conjuntos de errores en orden de lineas
                 }
             }
-            last = myTokens.Last.Value.noLinea;
             newCopy = new LinkedList<tokens>(myTokens);
             myTokens.Clear();
             foreach (tokens x in newCopy)
             {
                 if (x.id != "ERROR" && x.id != "Comment" && x.id != "WhiteSpace")
                 {
-                    myTokens.AddLast(x); ; ;
+                    myTokens.AddLast(x);
                 }
             }
             newCopy.Clear();
             newCopy = new LinkedList<tokens>(myTokens);
             program();
-            if (errorsTable.Count > 0)
+            foreach(errors x in errorsTable)
             {
-                for (int z = 1; z <= last; z++)
-                {
-                    foreach (errors x in errorsTable)
-                    {
-                        if (x.line == z)
-                        {
-                            Console.WriteLine("Linea: " + x.line + "\t\tDescripcion: " + x.type + "\t\tCerca de: " + x.aprox);
-                        }
-                    }
-                }
+                Console.WriteLine(x.aprox + "     " + x.line + "     " + x.type + "     ");
             }
-            else
-            {
-                myTokens = new LinkedList<tokens>(newCopy);
-                translator();
-                //Aqui iria la función para el traductor
-            }
-            Console.WriteLine("Todo correcto :D. Presione una tecla para continuar.");
             Console.ReadKey();
         }
 
@@ -327,40 +308,26 @@ namespace compiler
             int count = 0;
             bool check = myTokens.First.Value.id == "integer";
             count += 1;
+            check = check && (myTokens.First.Next.Value.id == "UserDefined");
+            functions.AddLast(myTokens.First.Next.Value.myValue);
+            count += 1;
+            check = check && (myTokens.First.Next.Next.Value.id == "LeftBrack");
+            count += 1;
             if (check)
             {
-                check = check && (myTokens.First.Next.Value.id == "UserDefined");
-                functions.AddLast(myTokens.First.Next.Value.myValue);
+                zone = myTokens.First.Next.Value.myValue;
+                tokensRemove(ref count);
+                check = check && listDeclVar();
+                check = check && (myTokens.First.Value.id == "RightBrack");
+                myTokens.RemoveFirst();
+                check = check && (myTokens.First.Value.id == "LeftPar");
                 count += 1;
+                tokensRemove(ref count);
+                check = check && statementList();
                 if (check)
                 {
-                    check = check && (myTokens.First.Next.Next.Value.id == "LeftBrack");
-                    count += 1;
-                    if (check)
-                    {
-                        zone = myTokens.First.Next.Value.myValue;
-                        tokensRemove(ref count);
-                        check = check && listDeclVar();
-                        check = check && (myTokens.First.Value.id == "RightBrack");
-                        myTokens.RemoveFirst();
-                        check = check && (myTokens.First.Value.id == "LeftPar");
-                        count += 1;
-                        tokensRemove(ref count);
-                        check = check && statementList();
-                        if (check)
-                        {
-                            tokensRemove(1);
-                        }
-                    }
+                    tokensRemove(1);
                 }
-                else
-                {
-                    tokensRemove(count);
-                }
-            }
-            else
-            {
-                tokensRemove(count);
             }
             count = 0;
             zone = "global";
@@ -385,7 +352,6 @@ namespace compiler
             }
             return check;
         }
-
         public static bool varDecl()
         {
             bool check;
@@ -535,43 +501,18 @@ namespace compiler
         private static bool opExpr(string type, ref simbols newSymbol)
         {
             bool check=true;
-            bool rev = false;
-            bool ch = true;
             string last="";
             if((type == "char" && myTokens.First.Value.id == "string" && myTokens.First.Value.myValue.Length==3) || (type == "char" && myTokens.First.Value.id == "UserDefined"))
-            {                
-                if(myTokens.First.Value.id == "UserDefined")
-                {
-                    foreach(simbols x in simbolsTable)
-                    {
-                        if (x.id == myTokens.First.Value.myValue && x.type == "char" && x.zone == zone)
-                        {
-                            rev = true;
-                        }
-                    }
-                    if (!rev)
-                    {
-                        newSymbol.value.AddLast(myTokens.First.Value);
-                        semanticError("Error en la variable " + myTokens.First.Value.myValue+ " en la igualación", myTokens.First.Value);
-                        tokensRemoveEOL1();
-                        check = true;
-                        ch = false;
-                    }
-                }
-                if (ch)
-                {
-                    newSymbol.value.AddLast(myTokens.First.Value);
-                }
-                tokensRemoveEOL1();
+            {
+                newSymbol.value.AddLast(myTokens.First.Value);
+                myTokens.RemoveFirst();
                 if (myTokens.First.Value.id == "EOL")
                 {
                     check = true;
                 }
                 else
                 {
-                    semanticError("Error en tipo y su valor", myTokens.First.Value);
-                    tokensRemoveEOL1();
-                    check = true;
+                    check = false;
                 }
             }
             else if(type =="integer" || type == "float" || type == "UserDefined")
@@ -581,23 +522,6 @@ namespace compiler
                 myTokens.RemoveFirst();
                 for (int x = 0; (myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "RightPar" && myTokens.First.Value.id != "RightBrack") && last != "EOL"; x++)
                 {
-                    if (myTokens.First.Value.id == "UserDefined")
-                    {
-                        
-                        foreach (simbols y in simbolsTable)
-                        {
-                            if (y.id == myTokens.First.Value.myValue && (y.type == "integer" || y.type == "float") && y.zone==zone)
-                            {
-                                rev = true;
-                            }
-                        }
-                        if (!rev)
-                        {
-                            semanticError("Error en la variable " + myTokens.First.Value.myValue + " en la igualación", myTokens.First.Value);
-                            tokensRemoveEOL1();
-                            check = true;
-                        }
-                    }
                     if (last == "Entero" || last == "Flotante" || last == "UserDefined")
                     {
                         if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "OpMul" || myTokens.First.Value.id == "OpDiv")
@@ -657,7 +581,7 @@ namespace compiler
             }
             return check;
         }
-            check = !rev || check;
+
 
         public static bool assignOp()
         {
@@ -813,7 +737,7 @@ namespace compiler
                     errors newError = new errors();
                     newError.line = myTokens.First.Value.noLinea;
                     newError.type = "Syntax";
-                    newError.aprox = myTokens.First.Value.myValue;
+                    newError.aprox = myTokens.First.Value.id;
                     errorsTable.AddLast(newError);
                     check = true;
                 }
@@ -875,7 +799,7 @@ namespace compiler
                             errors newError = new errors();
                             newError.line = myTokens.First.Value.noLinea;
                             newError.type = "Syntax";
-                            newError.aprox = myTokens.First.Value.myValue;
+                            newError.aprox = myTokens.First.Value.id;
                             errorsTable.AddLast(newError);
                             check = true;
                         }
@@ -934,7 +858,7 @@ namespace compiler
                     errors newError = new errors();
                     newError.line = myTokens.First.Value.noLinea;
                     newError.type = "Syntax";
-                    newError.aprox = myTokens.First.Value.myValue;
+                    newError.aprox = myTokens.First.Value.id;
                     errorsTable.AddLast(newError);
                     check = true;
                 }
@@ -951,7 +875,7 @@ namespace compiler
                         errors newError = new errors();
                         newError.line = myTokens.First.Value.noLinea;
                         newError.type = "Syntax";
-                        newError.aprox = myTokens.First.Value.myValue;
+                        newError.aprox = myTokens.First.Value.id;
                         errorsTable.AddLast(newError);
                         check = true;
                     }
@@ -968,7 +892,7 @@ namespace compiler
                             errors newError = new errors();
                             newError.line = myTokens.First.Value.noLinea;
                             newError.type = "Syntax";
-                            newError.aprox = myTokens.First.Value.myValue;
+                            newError.aprox = myTokens.First.Value.id;
                             errorsTable.AddLast(newError);
                             check = true;
                         }
@@ -1163,7 +1087,7 @@ namespace compiler
         }
 
         private static bool ifCond()
-        { 
+        {
             bool check = false;
             tokensRemove(1);
             if(myTokens.First.Value.id == "LeftBrack")
@@ -1179,7 +1103,7 @@ namespace compiler
                     errors newError = new errors();
                     newError.line = myTokens.First.Value.noLinea;
                     newError.type = "Syntax";
-                    newError.aprox = myTokens.First.Value.myValue;
+                    newError.aprox = myTokens.First.Value.id;
                     errorsTable.AddLast(newError);
                     check = true;
                 }
@@ -1352,7 +1276,7 @@ namespace compiler
             errors newError = new errors();
             newError.line = myTokens.First.Value.noLinea;
             newError.type = "Syntax";
-            newError.aprox = myTokens.First.Value.myValue;
+            newError.aprox = myTokens.First.Value.id;
             errorsTable.AddLast(newError);
         }
 
@@ -1478,38 +1402,35 @@ namespace compiler
             }
             return check;
         }
-
         private static void semanticError()
         {
             tokensRemoveEOL1();
             errors newError = new errors();
             newError.line = myTokens.First.Value.noLinea;
             newError.type = "Semantic";
-            newError.aprox = myTokens.First.Value.myValue;
+            newError.aprox = myTokens.First.Value.id;
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
         }
-
         private static void semanticError(string error)
         {
             tokensRemoveEOL1();
             errors newError = new errors();
             newError.line = myTokens.First.Value.noLinea;
             newError.type = error;
-            newError.aprox = myTokens.First.Value.myValue;
+            newError.aprox = myTokens.First.Value.id;
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
         }
-
         private static void semanticError(string error, tokens near)
         {
+            tokensRemoveEOL1();
             errors newError = new errors();
             newError.line = near.noLinea;
             newError.type = error;
-            newError.aprox = myTokens.First.Value.myValue;
+            newError.aprox = myTokens.First.Value.id;
             errorsTable.AddLast(newError);
             myTokens.RemoveFirst();
-            tokensRemoveEOL1();
         }
         /*
          * Estructura para almacenar cada linea
@@ -1546,8 +1467,8 @@ namespace compiler
         }
 
         /*
-         * Estructura para almacenar información
-         * de los errores en el codigo
+         * Estructura para almacenar datos
+         * acerca de las declaraciones de usuario
          */
         private struct errors
         {

@@ -1,6 +1,8 @@
-﻿intel nombre_variable=5+var/8*-(5+2/3).
+﻿intel var=5.
+intel nombre_variable=5+var/8*-(5+2/3).
+car persona = ´a´.
 car persona2=persona.
-intel miFuncion{car unCaracter}(
+intel main{}(
     car micar = ´b´.
     zy{nombre_variable<6}(
         por{intel x. x<5. x=x+1}( 
