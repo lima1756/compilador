@@ -658,7 +658,6 @@ namespace compiler
             check = !rev || check;
             return check;
         }
-            check = !rev || check;
 
         public static bool assignOp()
         {
