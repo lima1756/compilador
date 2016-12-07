@@ -23,7 +23,8 @@ namespace compiler
             errorsTable = new LinkedList<errors>();
             LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
             int conteo = 0;                                                 // Conteo auxiliar
-            path = @"Pruebas\Lenguaje inventado-prueba1.txt";                                  //Path donde leera el archivo a compilar
+           // path = @"Pruebas\Lenguaje inventado-prueba1.txt";                                  //Path donde leera el archivo a compilar
+            path = Environment.GetCommandLineArgs()[1].ToString(); // recibira la ruta del archivo creado en el IDE
             zone = "global";
             StreamReader sr = new StreamReader(path);
             string code = sr.ReadToEnd();

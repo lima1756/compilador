@@ -7,3 +7,12 @@ c:\users\samantha\documents\visual studio 2015\Projects\IDE\IDE\obj\Debug\IDE.Pr
 c:\users\samantha\documents\visual studio 2015\Projects\IDE\IDE\obj\Debug\IDE.csproj.GenerateResource.Cache
 c:\users\samantha\documents\visual studio 2015\Projects\IDE\IDE\obj\Debug\IDE.exe
 c:\users\samantha\documents\visual studio 2015\Projects\IDE\IDE\obj\Debug\IDE.pdb
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\bin\Debug\IDE.exe.config
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.exe
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.pdb
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.csprojResolveAssemblyReference.cache
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.Form1.resources
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.Properties.Resources.resources
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.csproj.GenerateResource.Cache
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\bin\Debug\IDE.exe
+C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\bin\Debug\IDE.pdb

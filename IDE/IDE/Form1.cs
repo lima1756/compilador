@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 using System.IO;
 namespace IDE
 {
@@ -701,7 +702,9 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
         {
             //toma la ruta del shell y la abre
          
-            System.Diagnostics.Process.Start("CompiladoresEinterpretes1\\Debug\\CompiladoresEinterpretes1");
+            
+            Process.Start("..\\..\\..\\..\\CompiladoresEinterpretes1\\Debug\\CompiladoresEinterpretes1", rutaynom);
+
         }
 
         private void ayudaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -731,6 +734,90 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
         private void toolStripTextBox1_Click(object sender, EventArgs e)
         {
+
+        }
+
+        private void compilarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            tamd = richTextBox1.Text.Length;
+            d = richTextBox1.Text;
+            if (!(a == d))
+            /*cambios en el richbox*/
+
+            {
+                /*sin haber guardado*/
+                if (nombrearchivo == "")
+                {
+                    if (MessageBox.Show("¿Quieres guardar cambios a este archivo sin nombre?", "IDE",
+    MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+    == DialogResult.Yes)
+
+                    {
+                        guardarComoToolStripMenuItem_Click(sender, e);
+                        Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
+
+
+                    }
+
+
+                    else
+                    {
+                        MessageBox.Show("Lo sentimos, pero debe guardar cambios");
+
+                    }
+
+
+                }
+                /*con nombre*/
+                else {
+
+                    if (MessageBox.Show("¿Quieres guardar cambios a " + rutaynom + "?", "IDE",
+          MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+          == DialogResult.Yes)
+
+                    {
+                        SaveFileDialog guardarcomo = new SaveFileDialog();
+                        guardarcomo.FileName = rutaynom;
+                        richTextBox1.SaveFile(guardarcomo.FileName, RichTextBoxStreamType.PlainText);
+                        tama = richTextBox1.Text.Length;
+                        a = richTextBox1.Text;
+                        Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
+
+
+                    }
+                    else {
+                        MessageBox.Show("Lo sentimos, pero debe guardar cambios");
+                    }
+
+                }
+
+
+
+            }
+            else {
+
+                if (MessageBox.Show("¿Quieres guardar cambios a este archivo sin nombre?", "IDE",
+         MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+         == DialogResult.Yes)
+
+                {
+                    guardarComoToolStripMenuItem_Click(sender, e);
+                    Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
+
+
+                }
+
+
+                else
+                {
+                    MessageBox.Show("Lo sentimos, pero debe guardar cambios");
+
+                }
+
+            }
+
+
 
         }
 
