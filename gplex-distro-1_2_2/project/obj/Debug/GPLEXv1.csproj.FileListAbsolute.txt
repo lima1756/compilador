@@ -1,0 +1,4 @@
+C:\Users\Luis Iván Morett\Desktop\gplex-distro-1_2_2\project\obj\Debug\GPLEXv1.csprojResolveAssemblyReference.cache
+C:\Users\Luis Iván Morett\Desktop\gplex-distro-1_2_2\project\obj\Debug\QUT.Gplex.IncludeResources.Content.resources
+C:\Users\Luis Iván Morett\Desktop\gplex-distro-1_2_2\project\obj\Debug\QUT.Gplex.Properties.Resources.resources
+C:\Users\Luis Iván Morett\Desktop\gplex-distro-1_2_2\project\obj\Debug\GPLEXv1.csproj.GenerateResource.Cache
