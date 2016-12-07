@@ -1,0 +1,11 @@
+Elimina uno o más archivos.
+
+DEL [/P] nombres
+ERASE [/P] nombres
+
+  nombres       Especifica una lista de uno o más archivos o directorios.
+                Se puede usar comodines para eliminar varios archivos.
+                Si se especifica un directorio, todos sus archivos se
+                eliminarán.
+
+  /P            Pide confirmación antes de eliminar cada archivo.

@@ -1,0 +1,4 @@
+Quita (elimina) un directorio.
+
+RMDIR [/S] [/Q] [unidad:]ruta
+RD [/S] [/Q] [unidad:]ruta

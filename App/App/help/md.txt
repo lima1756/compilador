@@ -1,0 +1,21 @@
+Crea un directorio.
+
+MKDIR [unidad:]ruta
+MD [unidad:]ruta
+
+Si las extensiones de comandos están habilitadas, MKDIR cambia así:
+
+MKDIR crea cualquier directorio intermedio de la ruta de acceso siempre
+que sea necesario. Por ejemplo, si \a no existe:
+
+    mkdir \a\b\c\d
+
+es lo mismo que:
+
+    mkdir \a
+    chdir \a
+    mkdir b
+    chdir b
+    mkdir c
+    chdir c
+    mkdir d

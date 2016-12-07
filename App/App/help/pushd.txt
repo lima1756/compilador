@@ -1,0 +1,6 @@
+Guarda el directorio actual para que lo use el comando POPD y después
+cambia al directorio especificado.
+
+PUSHD [ruta | ..]
+
+ ruta        Especifica el directorio al que hay que cambiar el actual.

@@ -1,0 +1,1 @@
+Permite pegar el texto que se encuentra en el portapapeles de la computadora en el editor de texto. En caso de que el portapapeles se encuentre vacio o con algo diferente a texto la opción se encontrara deshabilitada.

@@ -1,0 +1,5 @@
+Proporciona información de ayuda para los comandos de Windows.
+
+HELP [comando]
+
+    comando - muestra información de ayuda del comando especificado.

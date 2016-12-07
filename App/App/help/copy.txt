@@ -1,0 +1,11 @@
+Copia uno o más archivos en otra ubicación.
+
+COPY [/Y | /-Y] origen destino
+
+  origen       Especifica el archivo o archivos que deben copiarse.
+  destino      Especifica el directorio y/o el nombre de archivo de los
+               nuevos archivos.
+  /Y           Suprime la solicitud de confirmación antes de
+               sobrescribir un archivo de destino existente.
+  /-Y          Solicita confirmación antes de sobrescribir un archivo de
+               destino existente.

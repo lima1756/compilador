@@ -1,0 +1,4 @@
+Esta opción del menu muestra las opciones para obtener información del IDE y como funciona el mismo. Cuenta con las siguientes opciones:
+	-Acerca de
+	-Ayuda
+Para más información de cada opción vea su respectivo apartado.

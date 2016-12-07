@@ -1,0 +1,21 @@
+Mueve archivos y cambia el nombre a archivos y directorios.
+
+Mover uno o más archivos:
+MOVE [/Y | /-Y] [unidad:][ruta]nombrearchivo1 destino
+
+
+  destino            Especifica la nueva ubicación del archivo. El
+                     destino puede constar de una letra de unidad y
+                     dos puntos, un nombre de directorio o una
+                     combinación. Si mueve solo un archivo, también
+                     puede incluir un nombre de archivo si quiere
+                     cambiar el nombre del archivo cuando lo mueva.
+
+  [unidad:][ruta]nombredirectorio1  Especifica el directorio al que
+                     desea cambiar el nombre.
+
+  /Y                 Suprime la solicitud de confirmar si quiere
+                     sobrescribir un archivo de destino ya existente.
+
+  /-Y                Aparecerá la solicitud para confirmar si desea
+                     sobrescribir un archivo de destino ya existente.

@@ -1,0 +1,4 @@
+Cambia el nombre de uno o más archivos.
+
+RENAME [unidad:][ruta]archivo1 archivo2.
+REN [unidad:][ruta]archivo1 archivo2.

@@ -1,0 +1,5 @@
+Fija el título de la ventana en la ventana del símbolo del sistema.
+
+TITLE [cadena]
+
+ cadena    Especifica el título de la ventana del símbolo del sistema.

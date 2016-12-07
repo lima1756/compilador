@@ -1,0 +1,3 @@
+Borra la pantalla.
+
+CLS

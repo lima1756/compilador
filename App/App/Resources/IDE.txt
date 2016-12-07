@@ -1,0 +1,2 @@
+Esta aplicación es un Entorno de Desarrollo Integrado (IDE por las siglas en ingles) que proporciona servicios integrales para facilitarle al desarrollador o programador el desarrollo de software.
+

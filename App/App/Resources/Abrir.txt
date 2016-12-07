@@ -1,0 +1,1 @@
+Esta opción permite abrir un archivo que se encuentre en la computadora (o en un dispositivo externo conectado a la misma).

@@ -1,0 +1,1 @@
+Cierra el IDE, y cierra todos los archivos abiertos (permite guardar cada archivo antes de salir).

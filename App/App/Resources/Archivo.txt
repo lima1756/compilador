@@ -1,0 +1,9 @@
+Esta opción del menu muestra las opciones para la creación, obtención y el cierre de archivos. Cuenta con las siguientes opciones:
+	-Nuevo
+	-Abrir
+	-Guardar
+	-Guardar Como
+	-Salir
+	-Cerrar
+	-Shell
+Para más información de cada opción vea su respectivo apartado.

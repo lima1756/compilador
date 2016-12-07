@@ -1,0 +1,4 @@
+Abandona el programa CMD.EXE (intérprete de comandos) o el script
+por lotes actual.
+
+EXIT

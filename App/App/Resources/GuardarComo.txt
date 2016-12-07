@@ -1,0 +1,1 @@
+Permite guardar el archivo actual (el de la pestaña seleccionada) mostrandose la ventana para seleccionar un nombre y una dirección de destino.

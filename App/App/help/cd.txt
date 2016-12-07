@@ -1,0 +1,28 @@
+Muestra el nombre del directorio actual o cambia de directorio.
+
+CHDIR [/D] [unidad:][ruta]
+CHDIR [..]
+CD [/D] [unidad:][ruta]
+CD [..]
+
+  ..   Especifica que desea cambiar al directorio superior.
+
+Si las extensiones de comando están habilitadas, CHDIR cambia así:
+
+El uso de mayúsculas y minúsculas de la cadena del directorio actual se
+convierte al mismo uso que se tiene en los nombres de unidades. Así, CD
+C:\TEMP establecerá C:\Temp como el directorio actual si éste es el uso
+de mayúsculas y minúsculas en la unidad.
+
+El comando CHDIR no trata los espacios como separadores, así que es posible
+usar CD para cambiar a un directorio cuyo nombre de subdirectorio contenga
+un espacio, sin necesidad de escribir el nombre entre comillas. Por ejemplo:
+
+    cd\winnt\profiles\nombredeusuario\programas\menú inicio
+
+es lo mismo que:
+
+    cd "\winnt\profiles\nombredeusuario\programas\menú inicio"
+
+que sería lo que hay que escribir si las extensiones estuvieran
+deshabilitadas.

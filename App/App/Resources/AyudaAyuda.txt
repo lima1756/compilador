@@ -1,0 +1,1 @@
+Muestra esta ventana de ayuda, con la información necesaria para el uso del IDE.

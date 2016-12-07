@@ -1,0 +1,2 @@
+El comando BREAK insertará un punto de interrupción dentro del
+código, si está siendo depurado por un depurador.

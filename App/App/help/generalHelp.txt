@@ -1,0 +1,35 @@
+Para obtener más información acerca de un comando específico, escriba HELP
+seguido del nombre de comando
+
+BREAK          Genera una interrupción del sistema.
+CD             Muestra el nombre del directorio actual o cambia a otro
+               directorio.
+CLS            Borra la pantalla.
+CMD            Inicia una nueva instancia del intérprete de comandos.
+COLOR          Establece los colores de primer plano y fondo predeterminados
+               de la consola.
+COPY           Copia uno o más archivos en otra ubicación.
+DEL            Elimina uno o más archivos.
+DIR            Muestra una lista de archivos y subdirectorios en un
+               directorio.
+ECHO           Muestra mensajes, o activa y desactiva el eco.
+ERASE          Elimina uno o más archivos.
+EXIT           Sale del programa CMD.EXE (intérprete de comandos).
+HELP           Proporciona información de Ayuda para los comandos de Windows.
+HOSTNAME       Muestra el nombre del host
+MD             Crea un directorio.
+MKDIR          Crea un directorio.
+MOVE           Mueve uno o más archivos de un directorio a otro en la
+               misma unidad.
+PAUSE          Suspende el proceso de un archivo por lotes y muestra un mensaje.
+POPD           Restaura el valor anterior del directorio actual guardado
+               por PUSHD.
+PUSHD          Guarda el directorio actual y después lo cambia.
+RD             Quita un directorio.
+REN            Cambia el nombre de uno o más archivos.
+RENAME         Cambia el nombre de uno o más archivos.
+RMDIR          Quita un directorio.
+TITLE	       Fija el título de la ventana en la ventana del símbolo del 	                 sistema.
+VER            Muestra la versión del interprete.
+
+Para más información acerca de las herramientas, consulta la referencia de la línea de comandos en la Ayuda en pantalla.

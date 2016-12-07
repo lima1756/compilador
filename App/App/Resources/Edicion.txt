@@ -1,0 +1,5 @@
+Esta opción del menu muestra las opciones para la edición de texto. Cuenta con las siguientes opciones:
+	-Copiar
+	-Cortar
+	-Pegar
+Para más información de cada opción vea su respectivo apartado.

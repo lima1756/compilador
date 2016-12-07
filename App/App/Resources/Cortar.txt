@@ -1,0 +1,1 @@
+Corta el texto seleccionado dentro del editor, en caso de que no haya texto seleccionado la opción se encontrara deshabilitada.

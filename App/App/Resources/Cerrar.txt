@@ -1,0 +1,1 @@
+Cierra el archivo abierto actualmente (la pestaña seleccionada). Permite guardar los cambios hechos en el mismo antes de cerrarse.

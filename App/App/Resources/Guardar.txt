@@ -1,0 +1,1 @@
+Permite guardar el archivo actual (el de la pestaña seleccionada) en la dirección previamente establecida (en el guardar como o si se abrio el archivo). En caso de que sea un archivo nuevo se muestra la ventana para seleccionar un nombre y una dirección de destino.

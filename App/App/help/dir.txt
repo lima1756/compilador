@@ -1,0 +1,13 @@
+Muestra la lista de subdirectorios y archivos de un directorio.
+
+DIR [unidad:][ruta][archivo] [/B] [/L] [/P]
+
+  [unidad:][ruta][nombre de archivo]
+              Especifica la unidad, el directorio y los archivos que se
+              mostrarán.
+
+  /B          Usa el formato simple (sin encabezados ni sumarios).
+  /L          Usa letras minúsculas.
+  /N          Nuevo formato de lista larga donde los nombre de archivo aparecen
+              en el lado derecho.
+  /P          Hace una pausa después de cada pantalla completa de información.
