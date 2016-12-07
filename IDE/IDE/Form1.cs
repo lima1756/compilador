@@ -755,7 +755,7 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
                     {
                         guardarComoToolStripMenuItem_Click(sender, e);
-                        MessageBox.Show("rutaynom");
+                        MessageBox.Show(rutaynom);
                         Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
 
 
@@ -783,7 +783,7 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
                         richTextBox1.SaveFile(guardarcomo.FileName, RichTextBoxStreamType.PlainText);
                         tama = richTextBox1.Text.Length;
                         a = richTextBox1.Text;
-                        MessageBox.Show("rutaynom");
+                        MessageBox.Show(rutaynom);
                         Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
 
 
@@ -809,7 +809,7 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
                 {
                     guardarComoToolStripMenuItem_Click(sender, e);
-                        MessageBox.Show("rutaynom");
+                        MessageBox.Show(rutaynom);
                         Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
 
 
@@ -825,7 +825,7 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
             }
                 else
                 {
-                    MessageBox.Show("rutaynom");
+                    MessageBox.Show(rutaynom);
                     Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
 
                 }
