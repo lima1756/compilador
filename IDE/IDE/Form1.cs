@@ -703,7 +703,7 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
             //toma la ruta del shell y la abre
          
             
-            Process.Start("..\\..\\..\\..\\CompiladoresEinterpretes1\\Debug\\CompiladoresEinterpretes1", rutaynom);
+            Process.Start("..\\..\\..\\..\\App\\App\\bin\\debug\\Interprete", rutaynom);
 
         }
 
