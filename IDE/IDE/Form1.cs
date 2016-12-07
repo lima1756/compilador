@@ -755,6 +755,7 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
                     {
                         guardarComoToolStripMenuItem_Click(sender, e);
+                        MessageBox.Show("rutaynom");
                         Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
 
 
@@ -782,6 +783,7 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
                         richTextBox1.SaveFile(guardarcomo.FileName, RichTextBoxStreamType.PlainText);
                         tama = richTextBox1.Text.Length;
                         a = richTextBox1.Text;
+                        MessageBox.Show("rutaynom");
                         Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
 
 
@@ -797,13 +799,18 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
             }
             else {
 
+                if(rutaynom=="")
+                { 
+
+
                 if (MessageBox.Show("¿Quieres guardar cambios a este archivo sin nombre?", "IDE",
          MessageBoxButtons.YesNo, MessageBoxIcon.Question)
          == DialogResult.Yes)
 
                 {
                     guardarComoToolStripMenuItem_Click(sender, e);
-                    Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
+                        MessageBox.Show("rutaynom");
+                        Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
 
 
                 }
@@ -816,8 +823,15 @@ MessageBoxButtons.YesNo, MessageBoxIcon.Question)
                 }
 
             }
+                else
+                {
+                    MessageBox.Show("rutaynom");
+                    Process.Start("..\\..\\..\\..\\compiler\\compiler\\bin\\Debug\\compiler", rutaynom);
+
+                }
 
 
+            }
 
         }
 
