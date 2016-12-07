@@ -352,7 +352,11 @@ namespace compiler
                         check = check && statementList();
                         if (!retornar)
                         {
-                            semanticError("Falta retornar algo", myTokens.First.Value);
+                            errors newError = new errors();
+                            newError.line = myTokens.First.Value.noLinea;
+                            newError.type = "Falta retornar algo";
+                            newError.aprox = myTokens.First.Value.myValue;
+                            errorsTable.AddLast(newError);
                         }
                         if (check && retornar)
                         {
@@ -828,6 +832,16 @@ namespace compiler
                             semanticError("Tipo de dato retornado incorrecto o desconocido");
                         }
                         retornar = true;
+                        check = true;
+                    }
+                    else if ((myTokens.First.Value.id == "Entero" || myTokens.First.Value.id == "UserDefined") && myTokens.First.Next.Value.id == "RightPar")
+                    {
+                        TokensRemoveRightPar();
+                        errors newError = new errors();
+                        newError.line = myTokens.First.Value.noLinea;
+                        newError.type = "Syntax";
+                        newError.aprox = myTokens.First.Value.myValue;
+                        errorsTable.AddLast(newError);
                         check = true;
                     }
                     else
@@ -1444,6 +1458,13 @@ namespace compiler
             }
         }
 
+        private static void TokensRemoveRightPar()
+        {
+            for (int x = 0; myTokens.First.Value.id != "RightPar"; x++)
+            {
+                myTokens.RemoveFirst();
+            }
+        }
         /*
          * Inicio del analizadir semantico
          * Lo que hace falta que no se analizo junto al sintactico
