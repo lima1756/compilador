@@ -23,7 +23,7 @@ namespace compiler
             errorsTable = new LinkedList<errors>();
             LinkedList<tokens> newCopy;                                     // Auxiliar para la lista de myTokens
             int conteo = 0;                                                 // Conteo auxiliar
-           // path = @"Pruebas\Lenguaje inventado-prueba1.txt";                                  //Path donde leera el archivo a compilar
+                                                                            //path = @"C:\Users\franc\Desktop\kkljlk.txt";                                  //Path donde leera el archivo a compilar
             path = Environment.GetCommandLineArgs()[1].ToString(); // recibira la ruta del archivo creado en el IDE
             //path = path + ".txt"; 
             zone = "global";
@@ -69,19 +69,22 @@ namespace compiler
                     //Se deben de agregar los errores a una tabla de errores para que se impriman al final todos los conjuntos de errores en orden de lineas
                 }
             }
-            last = myTokens.Last.Value.noLinea;
             newCopy = new LinkedList<tokens>(myTokens);
-            myTokens.Clear();
-            foreach (tokens x in newCopy)
+            if (myTokens.Count != 0)
             {
-                if (x.id != "ERROR" && x.id != "Comment" && x.id != "WhiteSpace")
+                last = myTokens.Last.Value.noLinea;
+                myTokens.Clear();
+                foreach (tokens x in newCopy)
                 {
-                    myTokens.AddLast(x); ; ;
+                    if (x.id != "ERROR" && x.id != "Comment" && x.id != "WhiteSpace")
+                    {
+                        myTokens.AddLast(x); ; ;
+                    }
                 }
+                newCopy.Clear();
+                newCopy = new LinkedList<tokens>(myTokens);
+                program();
             }
-            newCopy.Clear();
-            newCopy = new LinkedList<tokens>(myTokens);
-            program();
             if (errorsTable.Count > 0)
             {
                 Console.WriteLine("ERRORES: ");
@@ -299,7 +302,10 @@ namespace compiler
                 if (!check && myTokens.Count != 0)
                 {
                     syntaxError();
-                    tokensRemove(1);
+                    if (myTokens.Count != 0)
+                    {
+                        tokensRemove(1);
+                    }
                     check = program();
                 }
             }
@@ -402,7 +408,7 @@ namespace compiler
         public static bool varDecl()
         {
             bool check;
-            bool check2=false;
+            bool check2 = false;
             LinkedList<tokens> aux;
             string type = "";
             if (myTokens.First.Value.id == "integer")
@@ -470,7 +476,8 @@ namespace compiler
             int count = 0;
             string last;
             LinkedList<simbols> aux = new LinkedList<simbols>();
-            if (myTokens.First.Value.id == "UserDefined") {
+            if (myTokens.First.Value.id == "UserDefined")
+            {
                 last = myTokens.First.Value.id;
                 simbols sim = new simbols();
                 sim.id = myTokens.First.Value.myValue;
@@ -483,12 +490,12 @@ namespace compiler
                 {
                     if (check)
                     {
-                        if (x.id != "EOL" && x.id!= "OpAssign" && x.id != "RightBrack")
+                        if (x.id != "EOL" && x.id != "OpAssign" && x.id != "RightBrack")
                         {
                             if (last == "UserDefined" && x.id == "COMMA")
                             {
                                 last = x.id;
-                                
+
                                 check = true;
                             }
                             if (last == "COMMA" && x.id == "UserDefined")
@@ -575,15 +582,15 @@ namespace compiler
 
         private static bool opExpr(string type, ref simbols newSymbol)
         {
-            bool check=true;
+            bool check = true;
             bool rev = false;
             bool ch = true;
-            string last="";
-            if((type == "char" && myTokens.First.Value.id == "string" && myTokens.First.Value.myValue.Length==3) || (type == "char" && myTokens.First.Value.id == "UserDefined"))
-            {                
-                if(myTokens.First.Value.id == "UserDefined")
+            string last = "";
+            if ((type == "char" && myTokens.First.Value.id == "string" && myTokens.First.Value.myValue.Length == 3) || (type == "char" && myTokens.First.Value.id == "UserDefined"))
+            {
+                if (myTokens.First.Value.id == "UserDefined")
                 {
-                    foreach(simbols x in simbolsTable)
+                    foreach (simbols x in simbolsTable)
                     {
                         if (x.id == myTokens.First.Value.myValue && x.type == "char" && x.zone == zone)
                         {
@@ -593,7 +600,7 @@ namespace compiler
                     if (!rev)
                     {
                         newSymbol.value.AddLast(myTokens.First.Value);
-                        semanticError("Error en la variable " + myTokens.First.Value.myValue+ " en la igualación", myTokens.First.Value);
+                        semanticError("Error en la variable " + myTokens.First.Value.myValue + " en la igualación", myTokens.First.Value);
                         tokensRemoveEOL1();
                         check = true;
                         ch = false;
@@ -615,7 +622,7 @@ namespace compiler
                     check = true;
                 }
             }
-            else if(type =="integer" || type == "float" || type == "UserDefined")
+            else if (type == "integer" || type == "float" || type == "UserDefined")
             {
                 newSymbol.value.AddLast(myTokens.First.Value);
                 last = myTokens.First.Value.id;
@@ -624,10 +631,10 @@ namespace compiler
                 {
                     if (myTokens.First.Value.id == "UserDefined")
                     {
-                        
+
                         foreach (simbols y in simbolsTable)
                         {
-                            if (y.id == myTokens.First.Value.myValue && (y.type == "integer" || y.type == "float") && y.zone==zone)
+                            if (y.id == myTokens.First.Value.myValue && (y.type == "integer" || y.type == "float") && y.zone == zone)
                             {
                                 rev = true;
                             }
@@ -663,7 +670,7 @@ namespace compiler
                             myTokens.RemoveFirst();
                             check = true;
                         }
-                        else if(myTokens.First.Value.id== "LeftPar")
+                        else if (myTokens.First.Value.id == "LeftPar")
                         {
                             newSymbol.value.AddLast(myTokens.First.Value);
                             myTokens.RemoveFirst();
@@ -705,10 +712,10 @@ namespace compiler
             bool check = false;
             bool semantic = true;
             simbols another = new simbols();
-            string type="";
+            string type = "";
             if (myTokens.First.Value.id == "UserDefined" && myTokens.First.Next.Value.id == "OpAssign")
             {
-                foreach(simbols key in simbolsTable)
+                foreach (simbols key in simbolsTable)
                 {
                     if (key.id == myTokens.First.Value.myValue && (key.zone == "global" || key.zone == zone))
                     {
@@ -718,7 +725,7 @@ namespace compiler
                         semantic = true;
                         break;
                     }
-                        
+
                 }
                 if (semantic)
                 {
@@ -726,7 +733,8 @@ namespace compiler
                     myTokens.RemoveFirst();
                     check = opExpr(type, ref another);
                     checkSimbol(another);
-                    if (another.id == null) {
+                    if (another.id == null)
+                    {
                         check = false;
                     }
                 }
@@ -739,12 +747,12 @@ namespace compiler
             {
                 check = false;
             }
-            return check;            
+            return check;
         }
 
         private static bool statement()
         {
-            bool check=false;
+            bool check = false;
             switch (myTokens.First.Value.id)
             {
                 case "integer":
@@ -759,9 +767,9 @@ namespace compiler
                 case "UserDefined":
                     if (myTokens.First.Next.Value.id == "LeftBrack")
                     {
-                        foreach(string fun in functions)
+                        foreach (string fun in functions)
                         {
-                            if(fun == myTokens.First.Value.myValue)
+                            if (fun == myTokens.First.Value.myValue)
                             {
                                 check = true;
                                 break;
@@ -782,7 +790,7 @@ namespace compiler
                             }
                         }
                     }
-                    else if(myTokens.First.Next.Value.id == "OpAssign")
+                    else if (myTokens.First.Next.Value.id == "OpAssign")
                     {
                         check = assignOp();
                     }
@@ -817,7 +825,7 @@ namespace compiler
                         if (myTokens.First.Value.id == "UserDefined")
                         {
                             rev = false;
-                            foreach(simbols x in simbolsTable)
+                            foreach (simbols x in simbolsTable)
                             {
                                 if (x.id == myTokens.First.Value.myValue && (x.zone == "global" || x.zone == "zone") && x.type == "integer")
                                 {
@@ -858,12 +866,12 @@ namespace compiler
                 default:
                     check = false;
                     break;
-            } 
+            }
             if (check && myTokens.First.Value.id == "EOL")
             {
                 myTokens.RemoveFirst();
             }
-            else if(!check)
+            else if (!check)
             {
                 syntaxError();
             }
@@ -880,7 +888,7 @@ namespace compiler
                 check = logicOp();
                 if (!check)
                 {
-                    for (int x = 0; myTokens.First.Value.id != "RightBrack"; x++) 
+                    for (int x = 0; myTokens.First.Value.id != "RightBrack"; x++)
                     {
                         myTokens.RemoveFirst();
                     }
@@ -982,7 +990,7 @@ namespace compiler
 
         private static bool forLoop()
         {
-            bool check=false;
+            bool check = false;
             tokensRemove(1);
             if (myTokens.First.Value.id == "LeftBrack")
             {
@@ -991,7 +999,7 @@ namespace compiler
                 {
                     check = varDeclFor();
                 }
-                else if(myTokens.First.Value.id == "UserDefined")
+                else if (myTokens.First.Value.id == "UserDefined")
                 {
                     check = assignOp();
                 }
@@ -1050,7 +1058,7 @@ namespace compiler
                         {
                             tokensRemove(2);
                             check = statementList();
-                            if(check && myTokens.First.Value.id == "RightPar")
+                            if (check && myTokens.First.Value.id == "RightPar")
                             {
                                 tokensRemove(1);
                             }
@@ -1107,7 +1115,7 @@ namespace compiler
         private static bool statementList()
         {
             bool check = true;
-            if(myTokens.First.Value.id== "RightPar")
+            if (myTokens.First.Value.id == "RightPar")
             {
                 return true;
             }
@@ -1126,7 +1134,7 @@ namespace compiler
         {
             bool check = false;
             tokensRemove(1);
-            if (myTokens.First.Value.id== "LeftBrack" && myTokens.First.Next.Value.id == "string" 
+            if (myTokens.First.Value.id == "LeftBrack" && myTokens.First.Next.Value.id == "string"
                 && myTokens.First.Next.Next.Value.id == "COMMA")
             {
                 tokensRemove(3);
@@ -1139,16 +1147,16 @@ namespace compiler
         private static bool inVars()
         {
             bool check = false;
-            if(myTokens.First.Value.id == "Direction" && myTokens.First.Next.Value.id == "UserDefined")
+            if (myTokens.First.Value.id == "Direction" && myTokens.First.Next.Value.id == "UserDefined")
             {
                 tokensRemove(2);
                 check = true;
-                if(myTokens.First.Value.id == "COMMA")
+                if (myTokens.First.Value.id == "COMMA")
                 {
                     tokensRemove(1);
                     check = check && inVars();
                 }
-                else if(myTokens.First.Value.id == "RightBrack")
+                else if (myTokens.First.Value.id == "RightBrack")
                 {
                     tokensRemove(1);
                     check = true;
@@ -1186,10 +1194,10 @@ namespace compiler
         private static bool printExpr()
         {
             bool check = false;
-            if(myTokens.First.Value.id == "string")
+            if (myTokens.First.Value.id == "string")
             {
                 tokensRemove(1);
-                if(myTokens.First.Value.id == "RightBrack")
+                if (myTokens.First.Value.id == "RightBrack")
                 {
                     tokensRemove(1);
                     check = true;
@@ -1223,7 +1231,7 @@ namespace compiler
                     tokensRemove(1);
                     check = check && printVars();
                 }
-                else if(myTokens.First.Value.id == "RightBrack")
+                else if (myTokens.First.Value.id == "RightBrack")
                 {
                     tokensRemove(1);
                     check = true;
@@ -1237,10 +1245,10 @@ namespace compiler
         }
 
         private static bool ifCond()
-        { 
+        {
             bool check = false;
             tokensRemove(1);
-            if(myTokens.First.Value.id == "LeftBrack")
+            if (myTokens.First.Value.id == "LeftBrack")
             {
                 tokensRemove(1);
                 check = logicOp();
@@ -1261,7 +1269,7 @@ namespace compiler
                 {
                     tokensRemove(2);
                     statementList();
-                    if(myTokens.First.Value.id == "RightPar")
+                    if (myTokens.First.Value.id == "RightPar")
                     {
                         tokensRemove(1);
                         check = true;
@@ -1294,9 +1302,9 @@ namespace compiler
             {
                 check = false;
             }
-                return check;
+            return check;
         }
-        
+
         private static bool logicOp()
         {
             string last;
@@ -1307,8 +1315,8 @@ namespace compiler
             {
                 if (last == "Entero" || last == "Flotante" || last == "UserDefined" || last == "string")
                 {
-                    if (myTokens.First.Value.id == "OpAnd" || myTokens.First.Value.id == "OpOr" || myTokens.First.Value.id == "OpNotEqu" 
-                        || myTokens.First.Value.id == "OpEqu" || myTokens.First.Value.id == "OpGtEq" || myTokens.First.Value.id == "OpLtEq" 
+                    if (myTokens.First.Value.id == "OpAnd" || myTokens.First.Value.id == "OpOr" || myTokens.First.Value.id == "OpNotEqu"
+                        || myTokens.First.Value.id == "OpEqu" || myTokens.First.Value.id == "OpGtEq" || myTokens.First.Value.id == "OpLtEq"
                         || myTokens.First.Value.id == "OpNot" || myTokens.First.Value.id == "OpLt" || myTokens.First.Value.id == "OpGt")
                     {
                         last = myTokens.First.Value.id;
@@ -1383,7 +1391,7 @@ namespace compiler
                 }
                 else if (last == "OpAdd" || last == "OpMinus" || last == "OpMul" || last == "OpDiv")
                 {
-                    if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero" 
+                    if (myTokens.First.Value.id == "OpAdd" || myTokens.First.Value.id == "OpMinus" || myTokens.First.Value.id == "Entero"
                         || myTokens.First.Value.id == "Flotante" || myTokens.First.Value.id == "UserDefined")
                     {
                         last = myTokens.First.Value.id;
@@ -1412,7 +1420,7 @@ namespace compiler
                     check = false;
                 }
             }
-            if(last == "OpAnd" || last == "OpOr" || last == "OpNotEqu" || last == "OpEqu" || last == "OpGtEq" || last == "OpLtEq"
+            if (last == "OpAnd" || last == "OpOr" || last == "OpNotEqu" || last == "OpEqu" || last == "OpGtEq" || last == "OpLtEq"
                         || last == "OpLt" || last == "OpGt" || last == "OpAdd" || last == "OpMinus" || last == "OpMul" || last == "OpDiv")
             {
                 check = false;
@@ -1424,10 +1432,24 @@ namespace compiler
         {
             tokensRemoveEOL1();
             errors newError = new errors();
-            newError.line = myTokens.First.Value.noLinea;
-            newError.type = "Syntax";
-            newError.aprox = myTokens.First.Value.myValue;
-            errorsTable.AddLast(newError);
+            if (myTokens.Count != 0)
+            {
+                newError.line = myTokens.First.Value.noLinea;
+                newError.type = "Syntax";
+                newError.aprox = myTokens.First.Value.myValue;
+                errorsTable.AddLast(newError);
+            }
+            else
+            {
+                tokens error;
+                error.id = "ERROR";
+                error.myValue = "ERROR";
+                error.noLinea = -1;
+                newError.line = -1;
+                newError.type = "Error no establecido";
+                newError.aprox = error.myValue;
+                errorsTable.AddLast(newError);
+            }
         }
 
         private static void tokensRemove(ref int count)
@@ -1450,7 +1472,7 @@ namespace compiler
 
         private static void tokensRemoveEOL1()
         {
-            for (int x = 0; myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "read"
+            for (int x = 0; myTokens.Count != 0 && myTokens.First.Value.id != "EOL" && myTokens.First.Value.id != "read"
                 && myTokens.First.Value.id != "write" && myTokens.First.Value.id != "if" && myTokens.First.Value.id != "else"
                 && myTokens.First.Value.id != "while" && myTokens.First.Value.id != "do" && myTokens.First.Value.id != "for"
                 && myTokens.First.Value.id != "integer" && myTokens.First.Value.id != "float" && myTokens.First.Value.id != "char"
@@ -1478,17 +1500,17 @@ namespace compiler
             bool check = false;
             if (x.type == "char")
             {
-                foreach(tokens iT in x.value)
+                foreach (tokens iT in x.value)
                 {
-                    if(iT.id != "string" && iT.id.Length != 1 && iT.id != "UserDefined")
+                    if (iT.id != "string" && iT.id.Length != 1 && iT.id != "UserDefined")
                     {
                         semanticError("Expresión para el tipo de variable declarada incorrecta");
                         check = false;
                         break;
                     }
-                    else if(iT.id == "UserDefined")
+                    else if (iT.id == "UserDefined")
                     {
-                        foreach(simbols z in simbolsTable)
+                        foreach (simbols z in simbolsTable)
                         {
                             if (z.id == iT.myValue)
                             {
@@ -1514,11 +1536,11 @@ namespace compiler
                     }
                 }
             }
-            else if(x.type == "float" || x.type=="integer")
+            else if (x.type == "float" || x.type == "integer")
             {
                 foreach (tokens iT in x.value)
                 {
-                    if (iT.id != "Entero" && iT.id != "Flotante" && iT.id != "UserDefined" && iT.id != "OpAdd" && iT.id != "OpMinus" && iT.id != "OpMul" 
+                    if (iT.id != "Entero" && iT.id != "Flotante" && iT.id != "UserDefined" && iT.id != "OpAdd" && iT.id != "OpMinus" && iT.id != "OpMul"
                         && iT.id != "OpDiv" && iT.id != "LeftPar" && iT.id != "RightPar")
                     {
                         semanticError("Expresión para el tipo de variable declarada incorrecta");
@@ -1638,7 +1660,7 @@ namespace compiler
         }
         private static void translator()
         {
-            
+
         }
 
         private static void translateOp(string fullPath, StreamWriter file)

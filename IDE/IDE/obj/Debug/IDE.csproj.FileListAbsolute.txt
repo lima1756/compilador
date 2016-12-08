@@ -16,3 +16,12 @@ C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.Properties.Re
 C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\obj\Debug\IDE.csproj.GenerateResource.Cache
 C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\bin\Debug\IDE.exe
 C:\Users\Samantha\Desktop\NEWCOMP\compilador\IDE\IDE\bin\Debug\IDE.pdb
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\bin\Debug\IDE.exe.config
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\obj\Debug\IDE.exe
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\obj\Debug\IDE.pdb
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\bin\Debug\IDE.exe
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\bin\Debug\IDE.pdb
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\obj\Debug\IDE.csprojResolveAssemblyReference.cache
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\obj\Debug\IDE.Form1.resources
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\obj\Debug\IDE.Properties.Resources.resources
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\IDE\IDE\obj\Debug\IDE.csproj.GenerateResource.Cache

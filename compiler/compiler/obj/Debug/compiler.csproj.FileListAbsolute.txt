@@ -29,3 +29,10 @@ C:\Users\Samantha\Desktop\NEWCOMP\compilador\compiler\compiler\bin\Debug\compile
 C:\Users\Samantha\Desktop\NEWCOMP\compilador\compiler\compiler\bin\Debug\compiler.pdb
 C:\Users\Samantha\Desktop\NEWCOMP\compilador\compiler\compiler\bin\Debug\QUT.ShiftReduceParser.dll
 C:\Users\Samantha\Desktop\NEWCOMP\compilador\compiler\compiler\obj\Debug\compiler.csprojResolveAssemblyReference.cache
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\compiler\compiler\bin\Debug\compiler.exe.config
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\compiler\compiler\obj\Debug\compiler.exe
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\compiler\compiler\obj\Debug\compiler.pdb
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\compiler\compiler\bin\Debug\compiler.exe
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\compiler\compiler\bin\Debug\compiler.pdb
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\compiler\compiler\bin\Debug\QUT.ShiftReduceParser.dll
+C:\Users\franc\Desktop\CETI\Compiladores e interpretes\compilador\compiler\compiler\obj\Debug\compiler.csprojResolveAssemblyReference.cache
